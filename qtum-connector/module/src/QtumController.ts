@@ -14,10 +14,11 @@ import { Pagination } from './dto/Pagination';
 export abstract class QtumController {
     protected constructor(protected readonly service: QtumService) {
     }
+    protected abstract isTestnet(): Promise<boolean>
     @Post('v3/qtum/wallet/priv')
     async generatePrivateKey(@Body() body: GeneratePrivateKey) {
         try {
-            return await generatePrivateKeyFromMnemonic(Currency.QTUM, true, body.mnemonic, body.index);
+            return await generatePrivateKeyFromMnemonic(Currency.QTUM, await this.isTestnet(), body.mnemonic, body.index);
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
@@ -25,7 +26,7 @@ export abstract class QtumController {
     @Get('v3/qtum/address/:xpub/:i')
     async generateAddress(@Param() { xpub, i }: PathXpubI) {
         try {
-            return await generateAddressFromXPub(Currency.QTUM, true, xpub, Number(i));
+            return await generateAddressFromXPub(Currency.QTUM, await this.isTestnet(), xpub, Number(i));
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
@@ -49,7 +50,7 @@ export abstract class QtumController {
     @Get('v3/qtum/address/:key')
     async generateAddressPrivatekey(@Param() { key }: PathKey) {
         try {
-            return await generateAddressFromPrivatekey(Currency.QTUM, true, key);
+            return await generateAddressFromPrivatekey(Currency.QTUM,  await this.isTestnet(), key);
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
