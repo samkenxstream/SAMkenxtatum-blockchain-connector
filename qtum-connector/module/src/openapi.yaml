@@ -30,7 +30,7 @@ paths:
             example: xpub6EsCk1uU6cJzqvP9CdsTiJwT2rF748YkPnhv5Qo8q44DG7nn2vbyt48YRsNSUYS44jFCW9gwvD9kLQu9AuqXpTpM1c5hgg9PsuBLdeNncid
         - description: "Derivation index of desired address to be generated."
           in: path
-          name: index
+          name: i
           required: true
           schema:
             type: number
@@ -113,7 +113,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EthBlock"
+                $ref: "#/components/schemas/QtumBlock"
           description: OK
         400:
           <<: *API400
@@ -136,8 +136,6 @@ paths:
           in: path
           name: key
           required: true
-          maxLength: 52
-          minLength: 1
           schema:
             type: string
             example: "cNR1n1EuzzaWHD7xcmAo71mwxyVV3uJUbLoamQFiXzaJhjTfCF2P"
@@ -167,12 +165,10 @@ paths:
       description: "<h4>1 credit per API call.</h4><br/><p>Get UTXOS by address</p>"
       operationId: GetQtumUTXOs
       parameters:
-        - description: "Address"
+        - description: address
           in: path
-          name: Address
+          name: address
           required: true
-          maxLength: 150
-          minLength: 7
           schema:
             type: string
             example: "qWpEineYmtc2Ea25GqDYhvuzCjTiu5hMYA"
@@ -195,6 +191,7 @@ paths:
       summary: Generate QTUM Address
       tags:
         - Blockchain / QTUM
+
   /v3/qtum/address/{address}/balance:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get QTUM account balance in QTUM tokens on an account.</p>"
@@ -264,7 +261,7 @@ paths:
       summary: Get QTUM Transaction
       tags:
         - Blockchain / QTUM
-  /v3/qtum/transactions/address/{address}/?pageSize={pageSize}&offset={offset}:
+  /v3/qtum/transactions/address/{address}/:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get QTUM paginated transactions by address.</p>"
       operationId: GetQtumPaginatedTransaction
@@ -277,14 +274,14 @@ paths:
             type: string
             example: "qWpEineYmtc2Ea25GqDYhvuzCjTiu5hMYA"
         - description: "pageSize"
-          in: path
+          in: query
           name: pageSize
           required: true
           schema:
             type: number
             example: 20
         - description: "offset"
-          in: path
+          in: query
           name: offset
           required: true
           schema:
@@ -449,7 +446,9 @@ paths:
           content:
             application/json:
               schema:
-                  - $ref: "#/components/schemas/Wallet"
+                type: string
+                description: key
+                example: "cNR1n1EuzzaWHD7xcmAo71mwxyVV3uJUbLoamQFiXzaJhjTfCF2P"
           description: OK
         400:
           <<: *API400
@@ -656,7 +655,7 @@ components:
                     description: asm value
                     example: ""
                   addresses:
-                    type: array
+                    type: object
                     example: ["qWpEineYmtc2Ea25GqDYhvuzCjTiu5hMYA"]
                     description: array of addresses
         confirmations: 
@@ -682,7 +681,7 @@ components:
         blockhash: 
           type: string
           description: block hash
-          example: "53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc"
+          example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
         blockheight:
           type: number
           description: block height
@@ -701,7 +700,7 @@ components:
             type: string
           txid:
             description: transaction id
-            example:  "53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc"
+            example:  "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
             type: string
           vout:
             description: number of outputs
@@ -731,12 +730,90 @@ components:
             description: number of confirmations
             example: 0
             type: number
+    QtumBlock:
+      properties:
+        hash:
+          description: block hash
+          example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+          type: string
+        confirmations:
+            description: number of confirmations
+            example: 0
+            type: number
+        size:
+            description: block size
+            example: 0
+            type: number
+        height: 
+            description: block height
+            example: 0
+            type: number
+        version:
+            description: version number
+            example: 0
+            type: number
+        merkleroot: 
+            description: merkle tree root
+            example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+            type: string
+        tx: 
+          description: transactions array
+          type: object
+          example: ["0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"]
+        time:
+          description: timestamp
+          example: 0
+          type: number
+        nonce: 
+          description: nonce
+          example: 0
+          type: number
+        bits: 
+          description: bits
+          example: ""
+          type: string
+        difficulty: 
+          description: difficulty
+          example: ""
+          type: string
+        chainwork: 
+          description: chainwork
+          example: ""
+          type: string
+        previousblockhash: 
+          description: hash of previous block
+          example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+          type: string
+        nextblockhash:
+          description: hash of next block
+          example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+          type: string
+        flags: 
+          description: flags
+          example: ""
+          type: string
+        reward: 
+          description: reward
+          example: 0
+          type: number
+        isMainChain: 
+          description: is mainnet
+          example: true
+          type: string
+        minedBy: 
+          description: mined by address
+          example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+          type: string
+        poolInfo: 
+          description: pool information
+          example: {}
+          type: object
     QtumIRawTransactions:
       properties:
         pagesTotal: 
           type: number
           description: number of pages
-          value: 150
+          example: 150
         txns:
           type: array
           items:
@@ -842,7 +919,7 @@ components:
                           description: asm value
                           example: ""
                         addresses:
-                          type: array
+                          type: object
                           example: ["qWpEineYmtc2Ea25GqDYhvuzCjTiu5hMYA"]
                           description: array of addresses
               confirmations:
