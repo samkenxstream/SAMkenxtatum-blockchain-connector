@@ -7,10 +7,8 @@ import {
     IsOptional, Matches,
     ValidateIf,
   } from 'class-validator';
-  import { IsInRange } from '../validators/IsInRange'
-import { PathAddress } from './PathAddress';
-  
-  export class Pagination extends PathAddress{
+  import { IsInRange } from '../validators/IsInRange'  
+  export class Pagination{
     @IsNumber()
     @IsNotEmpty()
     @IsInRange(1, 50)

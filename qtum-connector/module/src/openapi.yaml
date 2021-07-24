@@ -82,9 +82,9 @@ paths:
           content:
             application/json:
               schema:
-                type: number
-                description: Current block number
-                example: 6491272
+                type: string
+                description: Current block hash
+                example: cdb5598c06ae670b70cd9502c6cb696cfa3bf298ac6b904892e877c364821330
           description: OK
         401:
           <<: *API401
@@ -192,7 +192,7 @@ paths:
       tags:
         - Blockchain / QTUM
 
-  /v3/qtum/address/{address}/balance:
+  /v3/qtum/account/{address}/balance:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get QTUM account balance in QTUM tokens on an account.</p>"
       operationId: QtumGetBalance
@@ -223,18 +223,18 @@ paths:
       summary: Get QTUM Account balance
       tags:
         - Blockchain / QTUM
-  /v3/qtum/transaction/{id}:
+  /v3/qtum/transaction/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get QTUM transaction by transaction hash.</p>"
       operationId: GetQtumTransaction
       parameters:
         - description: "Transaction hash"
           in: path
-          name: id
+          name: hash
           required: true
           schema:
             type: string
-            example: "0xe6e7340394958674cdf8606936d292f565e4ecc476aaa8b258ec8a141f7c75d7"
+            example: "a01e2e9f715590d8b766d1bbaa9229ad92fe1da996d8680fa9ef8cccf1467dec"
       responses:
         200:
           content:

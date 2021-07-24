@@ -56,8 +56,8 @@ export abstract class QtumService {
     public async getBlock(hash: string): Promise<QtumBlock> {
         try {
             const baseURL = await this.getFirstNodeUrl()
-            const res = await axios.get(baseURL + `/block/${hash}`)
-            return res.data.result
+            const res: QtumBlock = await axios.get(baseURL + `/block/${hash}`)
+            return res
         } catch (e) {
             this.logger.error(e)
             throw new QtumError(`Error occurred. ${e}`, 'qtum.error');
@@ -127,7 +127,7 @@ export abstract class QtumService {
         try {
             const baseURL = await this.getFirstNodeUrl()
             const to = pageSize + offset
-            const result = await axios.get(baseURL + `addrs/${address}/txs?from=${offset}&to=${to}}`)
+            const result = await axios.get(baseURL + `addrs/${address}/txs?from=${offset}&to=${to}`)
             return result.data as QtumIRawTransactions
         } catch (e) {
             this.logger.error(e)
