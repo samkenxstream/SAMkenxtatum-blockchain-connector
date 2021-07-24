@@ -19,26 +19,30 @@ import {
 } from '@emurgo/cardano-serialization-lib-nodejs'
 import BigNumber from 'bignumber.js'
 import { AdaError } from './AdaError'
+import {
+    BroadcastOrStoreKMSBtcBasedTransaction,
+    TransactionKMSResponse,
+    TransactionResponse, TxData,
+} from '@tatumio/blockchain-connector-common';
 
 const TX_FIELDS = '{block{number} includedAt fee hash inputs {address sourceTxHash sourceTxIndex txHash value} outputs {address index txHash value}}';
 
 export abstract class AdaService {
-  protected constructor(protected readonly logger: PinoLogger) {}
-
-  protected abstract isTestnet(): Promise<boolean>;
-
-  protected abstract getNodesUrl(): Promise<string[]>;
-
-  protected abstract getAdaGraphQLPort(): Promise<number>;
-
-  public async getGraphQLEndpoint(): Promise<string> {
-    const [[url], port] = await Promise.all([
-      this.getNodesUrl(),
-      this.getAdaGraphQLPort(),
-    ]);
-    return `${url}:${port}/graphql`;
+  protected constructor(protected readonly logger: PinoLogger) {
   }
 
+  protected abstract isTestnet(isTestnet?: boolean): Promise<boolean>;
+
+  protected abstract getNodesUrl(isTestnet?: boolean): Promise<string[]>;
+
+  protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[]): Promise<string>;
+
+  protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
+
+  public async getGraphQLEndpoint(isTestnet?: boolean): Promise<string> {
+    const [url] = await this.getNodesUrl(isTestnet)
+    return `${url}/graphql`;
+  }
 
   async generateWallet(mnemonic?: string) {
     return generateWallet(Currency.ADA, await this.isTestnet(), mnemonic);
@@ -72,16 +76,12 @@ export abstract class AdaService {
     return { key };
   }
 
-  public async getBlockChainInfo(): Promise<AdaBlockchainInfo> {
-    const [testnet, graphQLUrl] = await Promise.all([
-      this.isTestnet(),
-      this.getGraphQLEndpoint(),
-    ]);
-    const { tip } = (
-      await axios.post(graphQLUrl, {
-        query: '{ cardano { tip { number slotNo epoch { number } }} }',
-      })
-    ).data.data.cardano;
+  public async getBlockChainInfo(isTestnet?: boolean): Promise<AdaBlockchainInfo> {
+    const testnet = isTestnet === undefined ? await this.isTestnet() : isTestnet
+    const response = await this.sendNodeRequest({
+      query: '{ cardano { tip { number slotNo epoch { number } }} }',
+    }, isTestnet)
+    const { tip } = response.data.data.cardano;
     return {
       testnet,
       tip,
@@ -90,10 +90,8 @@ export abstract class AdaService {
 
 
   public async getBlock(hash: string): Promise<Block> {
-    const graphQLUrl = await this.getGraphQLEndpoint();
-    const [block] = (
-      await axios.post(graphQLUrl, {
-        query: `{ blocks (where: { hash: { _eq: "${hash}" } }) {
+    const response = await this.sendNodeRequest({
+      query: `{ blocks (where: { hash: { _eq: "${hash}" } }) {
           fees
           slotLeader { description, hash }
           forgedAt
@@ -110,16 +108,14 @@ export abstract class AdaService {
           previousBlock { hash, number  }
           vrfKey
         } }`,
-      })
-    ).data.data.blocks;
+    })
+    const [block] = response.data.data.blocks
     return block;
   }
 
   public async getTransaction(hash: string): Promise<Transaction> {
-    const graphQLUrl = await this.getGraphQLEndpoint();
-    const [transaction] = (
-      await axios.post(graphQLUrl, {
-        query: `{ transactions (where: { hash: { _eq: "${hash}" } }) {
+    const response = await this.sendNodeRequest({
+      query: `{ transactions (where: { hash: { _eq: "${hash}" } }) {
           block { hash number }
           blockIndex
           deposit
@@ -136,16 +132,14 @@ export abstract class AdaService {
           withdrawals { address amount transaction { hash }}
           withdrawals_aggregate { aggregate { count } }
         } }`,
-      })
-    ).data.data.transactions;
+    })
+    const [transaction] = response.data.data.transactions;
     return transaction;
   }
 
   public async getAccount(address: string): Promise<PaymentAddress> {
-    const graphQLUrl = await this.getGraphQLEndpoint();
-    const [account] = (
-      await axios.post(graphQLUrl, {
-        query: `{ paymentAddresses (addresses: "${address}") {
+    const response = await this.sendNodeRequest({
+      query: `{ paymentAddresses (addresses: "${address}") {
           summary {
             utxosCount
             assetBalances {
@@ -154,8 +148,8 @@ export abstract class AdaService {
             }
           }
         } }`,
-      })
-    ).data.data.paymentAddresses;
+    })
+    const [account] = response.data.data.paymentAddresses;
     return account;
   }
 
@@ -164,12 +158,10 @@ export abstract class AdaService {
     pageSize: string,
     offset: string,
   ): Promise<Transaction[]> {
-    const graphQLUrl = await this.getGraphQLEndpoint();
     const limit = pageSize && !isNaN(Number(pageSize)) ? Number(pageSize) : 0
     const offsetTransaction = offset && !isNaN(Number(offset)) ? Number(offset) : 0
-    const { transactions } = (
-      await axios.post(graphQLUrl, {
-        query: `{ transactions (
+    const response = await this.sendNodeRequest({
+      query: `{ transactions (
           limit: ${limit}
           offset: ${offsetTransaction}
           where: {
@@ -195,32 +187,37 @@ export abstract class AdaService {
             withdrawals_aggregate { aggregate { count } }
           }
         }`,
-      })
-    ).data.data;
+    })
+    const { transactions } = response.data.data;
     return transactions;
   }
 
 
-
-  public async broadcast(
-    txData: string,
-  ): Promise<{ txId: string }> {
-    const graphQLUrl = await this.getGraphQLEndpoint();
-    const txId = (await axios.post(graphQLUrl, {
+  public async broadcast({txData, signatureId}: TxData): Promise<TransactionResponse> {
+    const response = await this.sendNodeRequest({
       query: `mutation {
         submitTransaction(transaction: "${txData}") {
           hash
         }
       }`,
-    })).data.data.submitTransaction.hash;
+    })
+    const txId = response.data.data.submitTransaction.hash
+    if (signatureId) {
+      try {
+        await this.completeKMSTransaction(txId, signatureId)
+      } catch (e) {
+        this.logger.error(e);
+        return { txId, failed: true };
+      }
+    }
+
     return { txId };
   }
 
   public async getUtxosByAddress(
     address: string,
   ): Promise<AdaUtxo[]> {
-    const graphQLUrl = await this.getGraphQLEndpoint();
-    const utxos = (await axios.post(graphQLUrl, {
+    const response = await this.sendNodeRequest({
       query: `{ utxos (where: {
         address: {
           _eq: "${address}"
@@ -231,22 +228,37 @@ export abstract class AdaService {
         value
       }
     }`,
-    })).data.data.utxos;
-    return utxos;
+    })
+    return response.data.data.utxos;
   }
 
   public async sendTransaction(
     body: TransferBtcBasedBlockchain,
-  ): Promise<{ txId: string }> {
-    const txData = await this.prepareAdaTransaction(body);
-    return await this.broadcast(txData)
+  ): Promise<TransactionResponse | TransactionKMSResponse> {
+    const transactionData = await this.prepareAdaTransaction(body);
+    const signatureIds = [];
+    if (body.fromUTXO) {
+      const signatureId = body.fromUTXO.filter(utxo => utxo.signatureId).map(utxo => utxo.signatureId)
+      if (signatureId.length > 0) {
+        signatureIds.push(signatureId);
+      }
+    }
+    if (body.fromAddress) {
+      const signatureId = body.fromAddress.filter(address => address.signatureId).map(address => address.signatureId)
+      if (signatureId.length > 0) {
+        signatureIds.push(signatureId);
+      }
+    }
+    return await this.broadcastOrStoreKMSTransaction({
+      transactionData,
+      signatureIds: signatureIds.length > 0 ? signatureIds : undefined,
+    });
   }
 
-  public async getTransactionsFromBlockTillNow(blockNumber: number): Promise<Transaction[]> {
+  public async getTransactionsFromBlockTillNow(blockNumber: number, isTestnet?: boolean): Promise<Transaction[]> {
     try {
-      const graphQLUrl = await this.getGraphQLEndpoint();
-      const query = `{transactions(where:{block:{number:{_gte:${blockNumber}}}})${TX_FIELDS}}`;
-      const { data } = (await axios.post(graphQLUrl, { query })).data;
+      const response = await this.sendNodeRequest({query: `{transactions(where:{block:{number:{_gte:${blockNumber}}}})${TX_FIELDS}}`}, isTestnet)
+      const { data } = response.data;
       return (data?.transactions || []).map((t: any) => {
         t.block = t.block.number;
         delete t.block.number;
@@ -267,7 +279,7 @@ export abstract class AdaService {
     return this.signTransaction(txBuilder, transferBtcBasedBlockchain, privateKeysToSign)
   }
 
-  private async initTransactionBuilder() {
+  public async initTransactionBuilder() {
     const txBuilder = TransactionBuilder.new(
       LinearFee.new(
         BigNum.from_str('44'),
@@ -282,8 +294,8 @@ export abstract class AdaService {
     return txBuilder
   }
 
-  private async processFeeAndRest(transactionBuilder: TransactionBuilder, fromAmount: BigNumber, toAmount: BigNumber,
-                                          transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
+  public async processFeeAndRest(transactionBuilder: TransactionBuilder, fromAmount: BigNumber, toAmount: BigNumber,
+                                  transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
     const { fromAddress, fromUTXO } = transferBtcBasedBlockchain
     if (fromAddress) {
       this.addFeeAndRest(transactionBuilder, fromAddress[0].address, fromAmount, toAmount)
@@ -299,7 +311,7 @@ export abstract class AdaService {
     }
   }
 
-  private async addInputs(transactionBuilder: TransactionBuilder, transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
+  public async addInputs(transactionBuilder: TransactionBuilder, transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
     const { fromUTXO, fromAddress } = transferBtcBasedBlockchain
     if (fromAddress) {
       return this.addAddressInputs(transactionBuilder, fromAddress)
@@ -310,7 +322,7 @@ export abstract class AdaService {
     throw new Error('Field fromAddress or fromUTXO is not filled.')
   }
 
-  private async addAddressInputs(transactionBuilder: TransactionBuilder, fromAddresses: FromAddress[]) {
+  public async addAddressInputs(transactionBuilder: TransactionBuilder, fromAddresses: FromAddress[]) {
     let amount = new BigNumber(0)
     const privateKeysToSign: string[] = [];
     for (const fromAddress of fromAddresses) {
@@ -325,7 +337,7 @@ export abstract class AdaService {
     return { amount, privateKeysToSign }
   }
 
-private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: FromUTXO[]) {
+  public async addUtxoInputs(transactionBuilder: TransactionBuilder, fromUTXOs: FromUTXO[]) {
     let amount = new BigNumber(0)
     const privateKeysToSign: string[] = [];
     for (const utxo of fromUTXOs) {
@@ -341,7 +353,7 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
     return { amount, privateKeysToSign }
   }
 
-  private addInput(transactionBuilder: TransactionBuilder, privateKey: string, utxo: AdaUtxo, address: string) {
+  public addInput(transactionBuilder: TransactionBuilder, privateKey: string, utxo: AdaUtxo, address: string) {
     transactionBuilder.add_input(
       Address.from_bech32(address),
       TransactionInput.new(
@@ -352,7 +364,7 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
     )
   }
 
-  private addFeeAndRest = (transactionBuilder: TransactionBuilder, address: string, fromAmount: BigNumber, toAmount: BigNumber) => {
+  public addFeeAndRest = (transactionBuilder: TransactionBuilder, address: string, fromAmount: BigNumber, toAmount: BigNumber) => {
     const fromRest = Address.from_bech32(address);
     const tmpOutput = TransactionOutput.new(
       fromRest,
@@ -363,19 +375,19 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
     transactionBuilder.set_fee(BigNum.from_str(String(fee)));
   }
 
-  private addOutput = (transactionBuilder: TransactionBuilder, address: string, amount: string) => {
+  public addOutput = (transactionBuilder: TransactionBuilder, address: string, amount: string) => {
     transactionBuilder.add_output(TransactionOutput.new(
       Address.from_bech32(address),
       Value.new(BigNum.from_str(amount)),
     ));
   }
 
-  private signTransaction(transactionBuilder: TransactionBuilder, transferBtcBasedBlockchain: TransferBtcBasedBlockchain, privateKeysToSign: string[]) {
+  public signTransaction(transactionBuilder: TransactionBuilder, transferBtcBasedBlockchain: TransferBtcBasedBlockchain, privateKeysToSign: string[]) {
     const txBody = transactionBuilder.build();
     const { fromAddress, fromUTXO } = transferBtcBasedBlockchain
 
     if ((fromAddress && fromAddress[0].signatureId) || (fromUTXO && fromUTXO[0].signatureId)) {
-      return JSON.stringify({ txData: JSON.stringify(txBody.to_bytes()), privateKeysToSign });
+      return JSON.stringify({ txData: transferBtcBasedBlockchain, privateKeysToSign });
     }
 
     const witnesses = this.createWitnesses(txBody, transferBtcBasedBlockchain)
@@ -385,7 +397,7 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
     ).toString('hex')
   }
 
-  private createWitnesses(transactionBody: TransactionBody, transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
+  public createWitnesses(transactionBody: TransactionBody, transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
     const { fromAddress, fromUTXO } = transferBtcBasedBlockchain
     const txHash = hash_transaction(transactionBody);
     const vKeyWitnesses = Vkeywitnesses.new();
@@ -405,14 +417,14 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
     return witnesses
   }
 
-   private makeWitness (privateKey: string, txHash: TransactionHash, vKeyWitnesses: Vkeywitnesses) {
+  public makeWitness(privateKey: string, txHash: TransactionHash, vKeyWitnesses: Vkeywitnesses) {
     const privateKeyCardano = Bip32PrivateKey.from_128_xprv(
       Buffer.from(privateKey, 'hex'),
     ).to_raw_key();
     vKeyWitnesses.add(make_vkey_witness(txHash, privateKeyCardano));
   }
 
-  private addOutputs(transactionBuilder: TransactionBuilder, tos: To[]) {
+  public addOutputs(transactionBuilder: TransactionBuilder, tos: To[]) {
     let amount = new BigNumber(0)
     for (const to of tos) {
       const value = new BigNumber(1000000).times(to.value)
@@ -420,6 +432,28 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
       this.addOutput(transactionBuilder, to.address, value.toString())
     }
     return amount
+  }
+
+  private async broadcastOrStoreKMSTransaction({ transactionData, signatureIds }: BroadcastOrStoreKMSBtcBasedTransaction) {
+    if (signatureIds) {
+      return {
+        signatureId: await this.storeKMSTransaction(transactionData, Currency.ADA, signatureIds),
+      }
+    }
+    return this.broadcast({ txData: transactionData })
+  }
+
+  private async sendNodeRequest(body: any, isTestnet?: boolean) {
+    const graphQLUrl = await this.getGraphQLEndpoint(isTestnet)
+    const response = await axios.post(graphQLUrl, body)
+    if(response?.data?.errors?.length > 0 ) {
+      if(response.data.errors[0].message) {
+        throw new AdaError(response.data.errors[0].message, 'ada.error')
+      } else {
+        throw new AdaError('Ada error dont have message.', 'ada.error')
+      }
+    }
+    return response
   }
 }
 

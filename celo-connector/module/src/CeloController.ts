@@ -1,4 +1,4 @@
-import {Body, Get, HttpCode, HttpStatus, Param, Post, Query, Req} from '@nestjs/common';
+import {BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post, Query, Req} from '@nestjs/common';
 import {CeloService} from './CeloService';
 import {PathAddress} from './dto/PathAddress';
 import {CeloError} from './CeloError';
@@ -12,6 +12,7 @@ import {
     MintCeloErc20,
     TransferCeloOrCeloErc20Token,
     CeloSmartContractMethodInvocation,
+    SmartContractReadMethodInvocation,
 } from '@tatumio/tatum';
 import {PathAddressContractAddressI} from './dto/PathAddressContractAddressI';
 import {PathTokenContractAddress} from './dto/PathTokenContractAddress';
@@ -29,6 +30,12 @@ export abstract class CeloController {
         try {
             return await this.service.web3Method(body);
         } catch (e) {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -58,6 +65,12 @@ export abstract class CeloController {
         try {
             return await this.service.transfer(body);
         } catch (e) {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -123,7 +136,10 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.transferErc721(req.body);
         } catch (e) {
-            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
                 throw e;
             }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
@@ -137,7 +153,10 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.mintErc721(req.body);
         } catch (e) {
-            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
                 throw e;
             }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
@@ -151,7 +170,10 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.mintMultipleErc721(req.body);
         } catch (e) {
-            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
                 throw e;
             }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
@@ -165,7 +187,10 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.burnErc721(req.body);
         } catch (e) {
-            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
                 throw e;
             }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
@@ -179,7 +204,10 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.deployErc721(req.body);
         } catch (e) {
-            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
                 throw e;
             }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
@@ -192,26 +220,44 @@ export abstract class CeloController {
         try {
             return await this.service.transferErc20(body);
         } catch (e) {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
 
     @Post('v3/celo/smartcontract')
     @HttpCode(HttpStatus.OK)
-    public async invokeCeloSmartContractMethod(@Body() body: CeloSmartContractMethodInvocation) {
+    public async invokeCeloSmartContractMethod(@Body() body: CeloSmartContractMethodInvocation | SmartContractReadMethodInvocation) {
       try {
         return await this.service.invokeSmartContractMethod(body);
       } catch (e) {
+          if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+              throw new BadRequestException(e);
+          }
+          if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
+              throw e;
+          }
         throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
       }
     }
-  
+
       @Post('/v3/celo/erc20/mint')
     @HttpCode(HttpStatus.OK)
     public async mintErc20(@Body() body: MintCeloErc20) {
         try {
             return await this.service.mintErc20(body);
         } catch (e) {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -222,6 +268,12 @@ export abstract class CeloController {
         try {
             return await this.service.burnErc20(body);
         } catch (e) {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -232,6 +284,12 @@ export abstract class CeloController {
         try {
             return await this.service.deployErc20(body);
         } catch (e) {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -247,6 +305,12 @@ export abstract class CeloController {
         try {
             return await this.service.broadcast(body.txData, body.signatureId);
         } catch (e) {
+            if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError' || e.constructor.name === CeloError.name) {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }

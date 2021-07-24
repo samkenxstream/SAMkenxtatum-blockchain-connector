@@ -14,10 +14,14 @@ export class AppService extends AdaService {
   }
 
   protected getNodesUrl(): Promise<string[]> {
-    return Promise.resolve(['http://51.75.161.255:3100/graphql']);
+    return Promise.resolve(['http://51.75.161.255:3100']);
   }
 
-  protected getAdaGraphQLPort(): Promise<number> {
-    return Promise.resolve(3100);
+  protected completeKMSTransaction(txId: string, signatureId: string): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  protected storeKMSTransaction(txData: string, currency: string, signatureId: string[]): Promise<string> {
+    return Promise.resolve('');
   }
 }

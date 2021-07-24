@@ -1,34 +1,34 @@
 import {Body, Get, HttpCode, HttpStatus, Param, Post, Query,} from '@nestjs/common';
 import { QtumService } from './QtumService';
 import { QtumError } from './QtumError';
-import { QtumIRawTransactionInfo, QtumIRawTransactions } from '@tatumio/tatum/dist/src/model/response';
-import { generateAddressFromPrivatekey, generateAddressFromXPub, generatePrivateKeyFromMnemonic } from '@tatumio/tatum/dist/src/wallet/address';
-import { Currency } from '@tatumio/tatum';
-import { GeneratePrivateKey } from './dto/GeneratePrivateKey';
-import { PathXpubI } from './dto/PathXPubI';
-import { PathHash } from './dto/PathHash';
+import {
+    QtumIRawTransactionInfo,
+    QtumIRawTransactions,
+    generateAddressFromPrivatekey,
+    generateAddressFromXPub,
+    generatePrivateKeyFromMnemonic,
+    Currency,
+} from '@tatumio/tatum';
+import {GeneratePrivateKey, PathAddress, PathHash, PathXpub, Pagination} from '@tatumio/blockchain-connector-common';
 import { PathKey } from './dto/PathKey';
-import { PathAddress } from './dto/PathAddress';
-import { PathId } from './dto/PathId';
-import { Pagination } from './dto/Pagination';
 export abstract class QtumController {
     protected constructor(protected readonly service: QtumService) {
     }
-    protected abstract isTestnet(): Promise<boolean>
     @Post('v3/qtum/wallet/priv')
     @HttpCode(HttpStatus.OK)
     async generatePrivateKey(@Body() body: GeneratePrivateKey) {
         try {
-            return await generatePrivateKeyFromMnemonic(Currency.QTUM, await this.isTestnet(), body.mnemonic, body.index);
+            return await generatePrivateKeyFromMnemonic(Currency.QTUM, await this.service.isTestnet(), body.mnemonic, body.index);
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
     }
+
     @Get('v3/qtum/address/:xpub/:i')
     @HttpCode(HttpStatus.OK)
-    async generateAddress(@Param() { xpub, i }: PathXpubI) {
+    async generateAddress(@Param() {xpub, i}: PathXpub) {
         try {
-            return await generateAddressFromXPub(Currency.QTUM, await this.isTestnet(), xpub, Number(i));
+            return {address: await generateAddressFromXPub(Currency.QTUM, await this.service.isTestnet(), xpub, Number(i))};
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
@@ -43,6 +43,7 @@ export abstract class QtumController {
         }
     }
     @Get('v3/qtum/block/:hash')
+    @HttpCode(HttpStatus.OK)
     async getBlock(@Param() { hash }: PathHash) {
         try {
             return await this.service.getBlock(hash);
@@ -54,7 +55,7 @@ export abstract class QtumController {
     @HttpCode(HttpStatus.OK)
     async generateAddressPrivatekey(@Param() { key }: PathKey) {
         try {
-            return await generateAddressFromPrivatekey(Currency.QTUM,  await this.isTestnet(), key);
+            return await generateAddressFromPrivatekey(Currency.QTUM,  await this.service.isTestnet(), key);
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
@@ -89,18 +90,19 @@ export abstract class QtumController {
     }
     @Get('v3/qtum/transaction/:hash')
     @HttpCode(HttpStatus.OK)
-    async getQtumTransaction(@Param() { hash }: PathId): Promise<QtumIRawTransactionInfo> {
+    async getQtumTransaction(@Param() { hash }: PathHash): Promise<QtumIRawTransactionInfo> {
         try {
             return await this.service.getQtumTransaction(hash);
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
     }
-    @Get('v3/qtum/transactions/address/:address')
+
+    @Get('/v3/qtum/transactions/address/:address')
     @HttpCode(HttpStatus.OK)
-    async getQtumTransactions(@Param() address: string, @Query() query: Pagination): Promise<QtumIRawTransactions> {
+    async getQtumTransactions(@Query() {pageSize, offset}: Pagination, @Param() {address}: PathAddress): Promise<QtumIRawTransactions> {
         try {
-            return await this.service.getQtumTransactions(address, query.pageSize, query.offset);
+            return await this.service.getQtumTransactions(address, parseInt(pageSize), offset ? parseInt(offset) : undefined);
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }

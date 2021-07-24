@@ -1,4 +1,4 @@
-import {Body, Get, HttpCode, HttpStatus, Param, Post, Query,} from '@nestjs/common';
+import {BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post, Query,} from '@nestjs/common';
 import {BscService} from './BscService';
 import {QueryMnemonic} from './dto/QueryMnemonic';
 import {GeneratePrivateKey} from './dto/GeneratePrivateKey';
@@ -8,6 +8,7 @@ import {
   DeployErc20,
   EstimateGasEth,
   SmartContractMethodInvocation,
+  SmartContractReadMethodInvocation,
   TransferBscBep20,
   TransferCustomErc20,
 } from '@tatumio/tatum';
@@ -26,6 +27,12 @@ export abstract class BscController {
     try {
       return await this.service.web3Method(body);
     } catch (e) {
+      if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+        throw new BadRequestException(e);
+      }
+      if (e.constructor.name === 'TatumError' || e.constructor.name === BscError.name) {
+        throw e;
+      }
       throw new BscError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'bsc.error');
     }
   }
@@ -56,6 +63,12 @@ export abstract class BscController {
     try {
       return await this.service.sendBscOrBep20Transaction(body);
     } catch (e) {
+      if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+        throw new BadRequestException(e);
+      }
+      if (e.constructor.name === 'TatumError' || e.constructor.name === BscError.name) {
+        throw e;
+      }
       throw new BscError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'bsc.error');
     }
   }
@@ -66,6 +79,12 @@ export abstract class BscController {
     try {
       return await this.service.estimateGas(body);
     } catch (e) {
+      if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+        throw new BadRequestException(e);
+      }
+      if (e.constructor.name === 'TatumError' || e.constructor.name === BscError.name) {
+        throw e;
+      }
       throw new BscError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'bsc.error');
     }
   }
@@ -82,10 +101,16 @@ export abstract class BscController {
 
   @Post('v3/bsc/smartcontract')
   @HttpCode(HttpStatus.OK)
-  public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation) {
+  public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation | SmartContractReadMethodInvocation) {
     try {
       return await this.service.invokeSmartContractMethod(body);
     } catch (e) {
+      if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+        throw new BadRequestException(e);
+      }
+      if (e.constructor.name === 'TatumError' || e.constructor.name === BscError.name) {
+        throw e;
+      }
       throw new BscError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'bsc.error');
     }
   }
@@ -96,6 +121,12 @@ export abstract class BscController {
     try {
       return await this.service.sendCustomBep20Transaction(body);
     } catch (e) {
+      if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+        throw new BadRequestException(e);
+      }
+      if (e.constructor.name === 'TatumError' || e.constructor.name === BscError.name) {
+        throw e;
+      }
       throw new BscError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'bsc.error');
     }
   }
@@ -106,6 +137,12 @@ export abstract class BscController {
     try {
       return await await this.service.deployBep20(body);
     } catch (e) {
+      if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+        throw new BadRequestException(e);
+      }
+      if (e.constructor.name === 'TatumError' || e.constructor.name === BscError.name) {
+        throw e;
+      }
       throw new BscError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'bsc.error');
     }
   }
@@ -116,6 +153,12 @@ export abstract class BscController {
     try {
       return await this.service.broadcast(body.txData, body.signatureId);
     } catch (e) {
+      if (['Array', 'ValidationError'].includes(e.constructor.name)) {
+        throw new BadRequestException(e);
+      }
+      if (e.constructor.name === 'TatumError' || e.constructor.name === BscError.name) {
+        throw e;
+      }
       throw new BscError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'bsc.error');
     }
   }

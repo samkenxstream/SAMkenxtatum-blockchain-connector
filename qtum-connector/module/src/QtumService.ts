@@ -7,7 +7,8 @@ export abstract class QtumService {
 
     protected constructor(protected readonly logger: PinoLogger) {
     }
-    protected abstract isTestnet(): Promise<boolean>
+
+    public abstract isTestnet(): Promise<boolean>
 
     protected abstract getNodesUrl(testnet: boolean): Promise<string[]>
 

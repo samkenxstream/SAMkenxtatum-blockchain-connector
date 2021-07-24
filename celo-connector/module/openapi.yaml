@@ -525,6 +525,7 @@ paths:
           application/json:
             schema:
               oneOf:
+                - $ref: "#/components/schemas/CallCeloReadSmartContractMethod"
                 - $ref: "#/components/schemas/CallCeloSmartContractMethod"
                 - $ref: "#/components/schemas/CallCeloSmartContractMethodKMS"
         required: true
@@ -1211,7 +1212,7 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Broadcast signed transaction to Celo blockchain. This method is used internally from Tatum KMS, Tatum Middleware or Tatum client libraries.
+        <p>Broadcast signed transaction to Celo blockchain. This method is used internally from Tatum KMS or Tatum client libraries.
         It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchian.</p>
       operationId: CeloBroadcast
       requestBody:
@@ -2396,6 +2397,48 @@ components:
         - fromPrivateKey
         - methodName
         - feeCurrency
+    CallCeloReadSmartContractMethod:
+      type: object
+      properties:
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        methodName:
+          minLength: 1
+          maxLength: 500
+          description: Name of the method to invoke on smart contract.
+          type: string
+          example: transfer
+        methodABI:
+          type: object
+          example: {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "stake",
+            "outputs": [ ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+          description: ABI of the method to invoke.
+        params:
+          type: array
+          example: [ '0x632' ]
+          items:
+            type: object
+          description: Parameters of the method to be invoked.
+      required:
+        - contractAddress
+        - params
+        - methodABI
+        - methodName
     CallCeloSmartContractMethodKMS:
       type: object
       properties:

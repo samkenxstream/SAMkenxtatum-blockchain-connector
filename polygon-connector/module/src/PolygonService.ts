@@ -1,33 +1,28 @@
 import {PinoLogger} from 'nestjs-pino';
 import {
-    BSC_BASED_CURRENCIES,
-    bscGetGasPriceInWei,
-    CONTRACT_ADDRESSES,
     Currency,
-    DeployErc20,
     EstimateGasEth,
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
     generateWallet,
-    prepareBscOrBep20SignedTransaction,
-    prepareBscSmartContractWriteMethodInvocation,
-    prepareCustomBep20SignedTransaction,
-    prepareDeployBep20SignedTransaction,
-    sendBscSmartContractReadMethodInvocationTransaction,
-    SmartContractMethodInvocation, SmartContractReadMethodInvocation,
+    polygonGetGasPriceInWei,
+    preparePolygonSignedTransaction,
+    preparePolygonSmartContractWriteMethodInvocation,
+    sendPolygonSmartContractReadMethodInvocationTransaction,
+    SignatureId,
+    SmartContractMethodInvocation,
+    SmartContractReadMethodInvocation,
     TransactionHash,
-    TransferBscBep20,
-    TransferCustomErc20,
+    TransferEthErc20,
 } from '@tatumio/tatum';
+import {BroadcastOrStoreKMSTransaction} from '@tatumio/blockchain-connector-common';
 import Web3 from 'web3';
 import {fromWei} from 'web3-utils';
-import ERC20_TOKEN_ABI from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 import axios from 'axios';
-import {SignatureId} from '@tatumio/tatum/dist/src/model/response/common/SignatureId';
-import {BscError} from './BscError';
+import {PolygonError} from './PolygonError';
 import BigNumber from 'bignumber.js';
 
-export abstract class BscService {
+export abstract class PolygonService {
 
     private static mapBlock(block: any) {
         return {
@@ -46,16 +41,20 @@ export abstract class BscService {
             stateRoot: block.stateRoot,
             timestamp: parseInt(block.timestamp, 16),
             totalDifficulty: parseInt(block.totalDifficulty, 16),
-            transactions: block.transactions.map(BscService.mapTransaction),
+            transactions: block.transactions.map(PolygonService.mapTransaction),
             uncles: block.uncles,
         };
     }
 
     private static mapTransaction(tx: any) {
+        delete tx.r;
+        delete tx.s;
+        delete tx.v;
         return {
             ...tx,
             blockNumber: parseInt(tx.blockNumber, 16),
             gas: parseInt(tx.gas, 16),
+            gasPrice: parseInt(tx.gasPrice, 16),
             nonce: parseInt(tx.nonce, 16),
             transactionIndex: parseInt(tx.transactionIndex, 16),
             value: new BigNumber(tx.value).toString(),
@@ -83,10 +82,10 @@ export abstract class BscService {
 
     protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
 
-    private async getFirstNodeUrl(testnet: boolean): Promise<string> {
+    public async getFirstNodeUrl(testnet: boolean): Promise<string> {
         const nodes = await this.getNodesUrl(testnet);
         if (nodes.length === 0) {
-            new BscError('Nodes url array must have at least one element.', 'bsc.nodes.url');
+            new PolygonError('Nodes url array must have at least one element.', 'polygon.nodes.url');
         }
         return nodes[0];
     }
@@ -95,16 +94,16 @@ export abstract class BscService {
         return new Web3(await this.getFirstNodeUrl(testnet));
     }
 
-    public async broadcast(txData: string, signatureId?: string, withdrawalId?: string): Promise<{
+    public async broadcast(txData: string, signatureId?: string): Promise<{
         txId: string,
         failed?: boolean,
     }> {
-        this.logger.info(`Broadcast tx for BSC with data '${txData}'`);
+        this.logger.info(`Broadcast tx for MATIC with data '${txData}'`);
         const client = await this.getClient(await this.isTestnet());
         const result: { txId: string } = await new Promise((async (resolve, reject) => {
             client.eth.sendSignedTransaction(txData)
                 .once('transactionHash', txId => resolve({txId}))
-                .on('error', e => reject(new BscError(`Unable to broadcast transaction due to ${e.message}.`, 'bsc.broadcast.failed')));
+                .on('error', e => reject(new PolygonError(`Unable to broadcast transaction due to ${e.message}.`, 'polygon.broadcast.failed')));
         }));
 
         if (signatureId) {
@@ -137,7 +136,7 @@ export abstract class BscService {
                     true
                 ]
             }, {headers: {'Content-Type': 'application/json'}})).data.result;
-            return BscService.mapBlock(block);
+            return PolygonService.mapBlock(block);
         } catch (e) {
             this.logger.error(e);
             throw e;
@@ -168,10 +167,10 @@ export abstract class BscService {
             } catch (_) {
                 transaction.transactionHash = hash;
             }
-            return BscService.mapTransaction({...transaction, ...receipt, hash});
+            return PolygonService.mapTransaction({...transaction, ...receipt, hash});
         } catch (e) {
             this.logger.error(e);
-            throw new BscError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
+            throw new PolygonError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
         }
     }
 
@@ -182,7 +181,7 @@ export abstract class BscService {
                                                  }: BroadcastOrStoreKMSTransaction) {
         if (signatureId) {
             return {
-                signatureId: await this.storeKMSTransaction(transactionData, Currency.BSC, [signatureId], index),
+                signatureId: await this.storeKMSTransaction(transactionData, Currency.MATIC, [signatureId], index),
             };
         }
         return this.broadcast(transactionData);
@@ -194,16 +193,16 @@ export abstract class BscService {
     }
 
     public async generateWallet(mnemonic?: string) {
-        return generateWallet(Currency.BSC, await this.isTestnet(), mnemonic);
+        return generateWallet(Currency.MATIC, await this.isTestnet(), mnemonic);
     }
 
     public async generatePrivateKey(mnemonic: string, index: number) {
-        const key = await generatePrivateKeyFromMnemonic(Currency.BSC, await this.isTestnet(), mnemonic, index);
+        const key = await generatePrivateKeyFromMnemonic(Currency.MATIC, await this.isTestnet(), mnemonic, index);
         return {key};
     }
 
     public async generateAddress(xpub: string, derivationIndex: string): Promise<{ address: string }> {
-        const address = await generateAddressFromXPub(Currency.BSC, await this.isTestnet(), xpub, parseInt(derivationIndex));
+        const address = await generateAddressFromXPub(Currency.MATIC, await this.isTestnet(), xpub, parseInt(derivationIndex));
         return {address};
     }
 
@@ -211,7 +210,7 @@ export abstract class BscService {
         const client = await this.getClient(await this.isTestnet());
         return {
             gasLimit: await client.eth.estimateGas(body),
-            gasPrice: await bscGetGasPriceInWei(),
+            gasPrice: await polygonGetGasPriceInWei(),
         };
     }
 
@@ -220,31 +219,11 @@ export abstract class BscService {
         return {balance: fromWei(await client.eth.getBalance(address), 'ether')};
     }
 
-    public async getBep20Balance(address: string, currency?: string, contractAddress?: string): Promise<{ balance: string }> {
-        if (await this.isTestnet() && currency) {
-            throw new BscError('Unsupported BEP20 currency for testnet, only mainet supports currency parameter. Please use contractAddress instead.', 'bep20.not.supported');
-        }
-        const contract = currency && BSC_BASED_CURRENCIES.includes(currency) ? CONTRACT_ADDRESSES[currency] : contractAddress;
-
-        const client = await this.getClient(await this.isTestnet());
-        // @ts-ignore
-        const web3Contract = new client.eth.Contract(ERC20_TOKEN_ABI, contract);
-        return {balance: await web3Contract.methods.balanceOf(address).call()};
-    }
-
-    public async sendBscOrBep20Transaction(transfer: TransferBscBep20): Promise<TransactionHash | SignatureId> {
-        const transactionData = await prepareBscOrBep20SignedTransaction(transfer, await this.getFirstNodeUrl(await this.isTestnet()));
+    public async sendMatic(transfer: TransferEthErc20): Promise<TransactionHash | SignatureId> {
+        const transactionData = await preparePolygonSignedTransaction(await this.isTestnet(), transfer, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
             transactionData, signatureId: transfer.signatureId,
             index: transfer.index
-        });
-    }
-
-    public async sendCustomBep20Transaction(transferCustomErc20: TransferCustomErc20): Promise<TransactionHash | SignatureId> {
-        const transactionData = await prepareCustomBep20SignedTransaction(transferCustomErc20, await this.getFirstNodeUrl(await this.isTestnet()));
-        return this.broadcastOrStoreKMSTransaction({
-            transactionData, signatureId: transferCustomErc20.signatureId,
-            index: transferCustomErc20.index
         });
     }
 
@@ -256,22 +235,14 @@ export abstract class BscService {
     public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation | SmartContractReadMethodInvocation) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
         if (smartContractMethodInvocation.methodABI.stateMutability === 'view') {
-            return sendBscSmartContractReadMethodInvocationTransaction(smartContractMethodInvocation, node);
+            return sendPolygonSmartContractReadMethodInvocationTransaction(await this.isTestnet(), smartContractMethodInvocation, node);
         }
 
-        const transactionData = await prepareBscSmartContractWriteMethodInvocation(smartContractMethodInvocation, node);
+        const transactionData = await preparePolygonSmartContractWriteMethodInvocation(await this.isTestnet(), smartContractMethodInvocation, node);
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
             signatureId: (smartContractMethodInvocation as SmartContractMethodInvocation).signatureId,
             index: (smartContractMethodInvocation as SmartContractMethodInvocation).index
-        });
-    }
-
-    public async deployBep20(deploy: DeployErc20) {
-        const transactionData = await prepareDeployBep20SignedTransaction(deploy, await this.getFirstNodeUrl(await this.isTestnet()));
-        return this.broadcastOrStoreKMSTransaction({
-            transactionData, signatureId: deploy.signatureId,
-            index: deploy.index
         });
     }
 }

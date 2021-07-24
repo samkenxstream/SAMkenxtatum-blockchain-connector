@@ -1,6 +1,6 @@
 {
   "name": "@tatumio/qtum-connector",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "QTUM Connector for Tatum API",
   "license": "MIT",
   "files": [
@@ -80,5 +80,8 @@
     },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "dependencies": {
+    "@tatumio/blockchain-connector-common": "^1.1.4"
   }
 }
