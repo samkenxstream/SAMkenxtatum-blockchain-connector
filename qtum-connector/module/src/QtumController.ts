@@ -109,7 +109,7 @@ export abstract class QtumController {
     }
     @Get('v3/qtum/transactions/gas/:nblocks')
     @HttpCode(HttpStatus.OK)
-    async estimateFee(@Param() nblocks: number): Promise<any> {
+    async estimateFee(@Param('nblocks') nblocks: number): Promise<any> {
         try {
             return await this.service.estimateFee(nblocks);
         } catch (e) {
@@ -118,7 +118,7 @@ export abstract class QtumController {
     }
     @Get('v3/qtum/transactions/gasbytes/:nblocks')
     @HttpCode(HttpStatus.OK)
-    async estimateFeePerByte(@Param() nblocks: number): Promise<any> {
+    async estimateFeePerByte(@Param('nblocks') nblocks: number): Promise<any> {
         try {
             return await this.service.estimateFeePerByte(nblocks);
         } catch (e) {
