@@ -26,7 +26,7 @@ export abstract class QtumController {
     }
     @Get('v3/qtum/wallet')
     @HttpCode(HttpStatus.OK)
-    async generateWallet(@Query() mnemonic: string) {
+    async generateWallet(@Query('mnemonic') mnemonic: string) {
         try {
             return await generateQtumWallet(await this.service.isTestnet(), mnemonic);
         } catch (e) {

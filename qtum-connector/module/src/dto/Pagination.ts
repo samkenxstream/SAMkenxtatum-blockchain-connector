@@ -1,11 +1,7 @@
 import {
-    IsBooleanString,
-    IsIn,
     IsNotEmpty,
     IsNumber,
-    IsNumberString,
-    IsOptional, Matches,
-    ValidateIf,
+    IsOptional,
   } from 'class-validator';
   import { IsInRange } from '../validators/IsInRange'  
   export class Pagination{

@@ -827,11 +827,11 @@ components:
           type: string
         previousblockhash: 
           description: hash of previous block
-          example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+          example: "0bc6703c708cc6fc5f7caee6f967e15261c2b28fb8939a5345e783bb69348ba4"
           type: string
         nextblockhash:
           description: hash of next block
-          example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+          example: "0bc6703c708cc6fc5f7caee6f967e15261c2b28fb8939a5345e783bb69348ba4"
           type: string
         flags: 
           description: flags
@@ -882,7 +882,7 @@ components:
                   properties:
                     blockHash: 
                       description: block hash
-                      example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+                      example: "0bc6703c708cc6fc5f7caee6f967e15261c2b28fb8939a5345e783bb69348ba4"
                       type: string
                     blockNumber: 
                       description: block number
@@ -990,7 +990,7 @@ components:
               blockhash:
                 type: string
                 description: hash of the block
-                example: "53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc"
+                example: "0bc6703c708cc6fc5f7caee6f967e15261c2b28fb8939a5345e783bb69348ba4"
               blockheight:
                 type: number
                 description: height of block
