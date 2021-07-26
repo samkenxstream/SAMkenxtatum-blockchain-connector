@@ -7,6 +7,7 @@ import {
     generateAddressFromPrivatekey,
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
+    generateQtumWallet,
     Currency,
 } from '@tatumio/tatum';
 import {GeneratePrivateKey, PathAddress, PathHash, PathXpub, Pagination} from '@tatumio/blockchain-connector-common';
@@ -19,6 +20,15 @@ export abstract class QtumController {
     async generatePrivateKey(@Body() body: GeneratePrivateKey) {
         try {
             return await generatePrivateKeyFromMnemonic(Currency.QTUM, await this.service.isTestnet(), body.mnemonic, body.index);
+        } catch (e) {
+            throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
+        }
+    }
+    @Get('v3/qtum/wallet')
+    @HttpCode(HttpStatus.OK)
+    async generateWallet(@Query() mnemonic: string) {
+        try {
+            return await generateQtumWallet(await this.service.isTestnet(), mnemonic);
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
@@ -79,7 +89,7 @@ export abstract class QtumController {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
     }
-    @Get('v3/qtum/account/:address/balance')
+    @Get('v3/qtum/account/balance/:address')
     @HttpCode(HttpStatus.OK)
     async getInfo(@Param() { address }: PathAddress) {
         try {
@@ -109,7 +119,7 @@ export abstract class QtumController {
     }
     @Get('v3/qtum/transactions/gas/:nblocks')
     @HttpCode(HttpStatus.OK)
-    async estimateFee(@Param() nblocks: number): Promise<any> {
+    async estimateFee(@Param('nblocks') nblocks: number): Promise<any> {
         try {
             return await this.service.estimateFee(nblocks);
         } catch (e) {
@@ -118,7 +128,7 @@ export abstract class QtumController {
     }
     @Get('v3/qtum/transactions/gasbytes/:nblocks')
     @HttpCode(HttpStatus.OK)
-    async estimateFeePerByte(@Param() nblocks: number): Promise<any> {
+    async estimateFeePerByte(@Param('nblocks') nblocks: number): Promise<any> {
         try {
             return await this.service.estimateFeePerByte(nblocks);
         } catch (e) {
