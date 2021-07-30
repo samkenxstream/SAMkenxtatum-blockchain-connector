@@ -28,9 +28,7 @@ export abstract class QtumController {
     @HttpCode(HttpStatus.OK)
     async generateWallet(@Query('mnemonic') mnemonic: string) {
         try {
-            const test= await generateWallet(Currency.QTUM,await this.service.isTestnet(), mnemonic);
-            console.log(test)
-            return test
+            return await generateWallet(Currency.QTUM,await this.service.isTestnet(), mnemonic);
         } catch (e) {
             throw new QtumError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'qtum.error');
         }
