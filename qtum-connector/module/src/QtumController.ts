@@ -7,7 +7,6 @@ import {
     generateAddressFromPrivatekey,
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
-    generateQtumWallet,
     generateWallet,
     Currency,
 } from '@tatumio/tatum';
