@@ -10,7 +10,7 @@ tags:
       <br/>
       Tatum supports 2 chains:
       <ul><li>Mainnet - a regular live chain
-      <li>Testnet - a chain used for testing purposes. Coins on the test chain have no value and can be obtained from
+      <li>Devnet - a chain used for testing purposes. Coins on the test chain have no value and can be obtained from
       a faucet, e.g. <a target="_blank" href="https://r3d4.fr/elrond/testnet/index.php">https://r3d4.fr/elrond/testnet/</a></li></ul></p>
     name: Blockchain / Elrond Network (EGLD)
 paths:
@@ -76,52 +76,52 @@ paths:
       summary: Generate EGLD wallet
       tags:
         - Blockchain / Elrond Network (EGLD)
-  # /v3/egld/address/{xpub}/{index}:
-  #   get:
-  #     description: |
-  #       <h4>1 credit per API call.</h4><br/>
-  #       <p>Generate EGLD account deposit address from Extended public key. Deposit address is generated for the specific
-  #       index - each extended public key can generate up to 2^31 addresses starting from index 0 until 2^31.</p>
-  #     operationId: EgldGenerateAddress
-  #     parameters:
-  #       - description: "Extended public key of wallet."
-  #         in: path
-  #         name: xpub
-  #         required: true
-  #         schema:
-  #           type: string
-  #           example: 0cd8e6217b4a218807b858ffb508483cdcdadbb7a21196727f764a510a692760
-  #       - description: "Derivation index of desired address to be generated."
-  #         in: path
-  #         name: index
-  #         required: true
-  #         schema:
-  #           type: number
-  #           example: 0
-  #     responses:
-  #       200:
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               properties:
-  #                 address:
-  #                   type: string
-  #                   description: EGLD address
-  #                   example: "erd1pnvwvgtmfgscspactrlm2zzg8nwd4kah5ggevunlwe99zznfyasq5m7fz2"
-  #         description: OK
-  #       400:
-  #         <<: *API400
-  #       401:
-  #         <<: *API401
-  #       500:
-  #         <<: *API500
-  #     security:
-  #       - X-Api-Key: [ ]
-  #     x-code-samples:
-  #     summary: Generate EGLD account address from Extended public key
-  #     tags:
-  #       - Blockchain / Elrond Network (EGLD)
+  /v3/egld/address/{mnemonic}/{index}:
+    get:
+      description: |
+        <h4>1 credit per API call.</h4><br/>
+        <p>Generate EGLD account deposit address from mnemonic phrase. Deposit address is generated for the specific
+        index - each mnemonic phrase can generate up to 2^31 addresses starting from index 0 until 2^31.</p>
+      operationId: EgldGenerateAddress
+      parameters:
+        - description: "Mnemonic to use for generation of address."
+          in: path
+          name: mnemonic
+          required: true
+          schema:
+            type: string
+            example: "quantum tobacco key they maid mean crime ..."
+        - description: "Derivation index of desired address to be generated."
+          in: path
+          name: index
+          required: true
+          schema:
+            type: string
+            example: 0
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: EGLD address
+                    example: erd1pnvwvgtm...
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Generate EGLD account address from mnemonic
+      tags:
+        - Blockchain / Elrond Network (EGLD)
   /v3/egld/wallet/priv:
     post:
       description: |
@@ -154,12 +154,13 @@ paths:
       summary: Generate EGLD private key
       tags:
         - Blockchain / Elrond Network (EGLD)
-  /v3/egld/web3/{xApiKey}/*:
+  /v3/egld/node/{xApiKey}/*:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
         <p>Use this endpoint URL as a http-based driver to connect directly to the EGLD node provided by Tatum.
         To learn more about EGLD, please visit <a href="https://docs.elrond.com/sdk-and-tools/rest-api/nodes/ target="_blank">EGLD developer's guide.</a></p>
+      example: "/v3/egld/web3/{xApiKey}/transaction/cost" 
       operationId: EgldWeb3Post
       parameters:
         - description: "Tatum X-API-Key used for authorization."
@@ -168,15 +169,49 @@ paths:
           required: true
           schema:
             type: string
-            example: asdlkfjnqunalkwjfnq2oi303294857k
+            example: asdlkfjnqunalkwjf...
       requestBody:
         content:
           application/json:
             schema:
               type: object
               description: Any valid method content body.
-              example: /network/config
+              example: {"version": 1,"chainId": "v1.0.141","nonce": 42,...}
         required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Any valid response.
+                example: 77000
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      x-code-samples:
+      summary: Node HTTP driver
+      tags:
+        - Blockchain / Elrond Network (EGLD)
+    get:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Use this endpoint URL as a http-based driver to connect directly to the EGLD node provided by Tatum.
+        To learn more about EGLD, please visit <a href="https://docs.elrond.com/sdk-and-tools/rest-api/nodes/ target="_blank">EGLD developer's guide.</a></p>
+      example: "/v3/egld/web3/{xApiKey}/network/config"
+      operationId: EgldWeb3Get
+      parameters:
+        - description: "Tatum X-API-Key used for authorization."
+          in: path
+          name: xApiKey
+          required: true
+          schema:
+            type: string
+            example: asdlkfjnqunalkwjf...
       responses:
         200:
           content:
@@ -193,42 +228,7 @@ paths:
         500:
           <<: *API500
       x-code-samples:
-      summary: Web3 HTTP driver
-      tags:
-        - Blockchain / Elrond Network (EGLD)
-  /v3/egld/web3/{xApiKey}/**:
-    get:
-      description: |
-        <h4>2 credits per API call.</h4><br/>
-        <p>Use this endpoint URL as a http-based driver to connect directly to the EGLD node provided by Tatum.
-        To learn more about EGLD, please visit <a href="https://docs.elrond.com/sdk-and-tools/rest-api/nodes/ target="_blank">EGLD developer's guide.</a></p>
-      example: "/v3/egld/web3/{xApiKey}/transaction/{txHash}?withResults=true"  
-      operationId: EgldWeb3Get
-      parameters:
-        - description: "Tatum X-API-Key used for authorization."
-          in: path
-          name: xApiKey
-          required: true
-          schema:
-            type: string
-            example: asdlkfjnqunalkwjfnq2oi303294857k
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Any valid response.
-                example: {"config":{"erd_chain_id":"1","erd_denomination":18,"erd_gas_per_data_byte": 1500,...}}
-          description: OK
-        400:
-          <<: *API400
-        401:
-          <<: *API401
-        500:
-          <<: *API500
-      x-code-samples:
-      summary: Web3 HTTP driver
+      summary: Node HTTP driver
       tags:
         - Blockchain / Elrond Network (EGLD)
   /v3/egld/block/current:
@@ -267,7 +267,7 @@ paths:
           required: true
           schema:
             type: string
-            example: c9e9f6387c6bc5be954a7a6ffd5c5c397f20c9b01ce874d740e82fac9ea04131
+            example: c9e9f6387c6...
       responses:
         200:
           content:
@@ -299,7 +299,7 @@ paths:
           required: true
           schema:
             type: string
-            example: "erd1pnvwvgtmfgscspactrlm2zzg8nwd4kah5ggevunlwe99zznfyasq5m7fz2"
+            example: "erd1pnvwvgtmf..."
       responses:
         200:
           content:
@@ -336,7 +336,7 @@ paths:
           required: true
           schema:
             type: string
-            example: "670aad15f2a2dfd1eff1547736352d0b79ddd312d5ba7085711d227f4505c5bf"
+            example: "670aad15f2a2..."
       responses:
         200:
           content:
@@ -366,6 +366,42 @@ paths:
       summary: Get EGLD Transaction
       tags:
         - Blockchain / Elrond Network (EGLD)
+  /v3/egld/transaction/address/:address:
+    get:
+      description: |
+        <h4>1 credit per API call.</h4><br/>
+        <p>This endpoint allows one to retrieve the latest 20 transactions sent from an address.</p>
+      operationId: EgldGetTransactionAddress
+      parameters:
+        - description: "address"
+          in: path
+          name: address
+          required: true
+          schema:
+            type: string
+            maxLength: 62
+            minLength: 62
+            example: "erd1pnvwvg..."
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of transactions sent from an address.
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get count of outgoing EGLD transactions
+      tags:
+        - Blockchain / Elrond Network (EGLD)
   /v3/egld/transaction/count/{address}:
     get:
       description: |
@@ -383,7 +419,7 @@ paths:
             type: string
             maxLength: 62
             minLength: 62
-            example: "erd1pnvwvgtmfgscspactrlm2zzg8nwd4kah5ggevunlwe99zznfyasq5m7fz2"
+            example: "erd1pnvwvgtmfg..."
       responses:
         200:
           content:
@@ -508,11 +544,11 @@ paths:
       summary: Estimate EGLD transaction fees
       tags:
         - Blockchain / Elrond Network (EGLD)
-  /v3/egld/smartcontract/{method}:
+  /v3/egld/esdt/{method}:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Working with a Smart Contract.
+        <p>Working with a Elrond Standard Digital Token.
         For read operations, data is returned, for write operations, transaction Id of the associated transaction is returned.<br/><br/>
 
         Detail information please find here <a href="https://docs.elrond.com/developers/esdt-tokens/" target="_blank"> Elrond DOCS </a>.<br/><br/>

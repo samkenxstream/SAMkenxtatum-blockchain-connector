@@ -46,7 +46,7 @@ export abstract class EgldService {
             epoch: block.epoch,
             numTxs: block.numTxs,
             shardBlocks: block.shardBlocks.map(EgldService.mapShardBlock),
-            transactions:  block.transactions.map(EgldService.mapTransaction),     
+            transactions:  block.transactions.map(EgldService.mapInBlockTransaction),     
         };
     }
 
@@ -58,11 +58,73 @@ export abstract class EgldService {
         };
     }
 
+    private static mapInBlockTransaction(tx: any) {
+        return {
+            type: tx.type,
+            hash: tx.hash,
+            nonce: tx.nonce,
+            value: tx.value,
+            receiver: tx.receiver,
+            sender: tx.sender,
+            gasPrice: tx.gasPrice,
+            gasLimit: tx.gasLimit,
+            data: tx.data,
+            signature: tx.signature,
+            status: tx.status,
+        };
+    };
+
     private static mapTransaction(tx: any) {
         return {
-            ...tx,
-        } as EgldTransaction;
+            type: tx.type,
+            nonce: tx.nonce,
+            round: tx.round,
+            epoch: tx.epoch,
+            value: tx.value,
+            receiver: tx.receiver,
+            sender: tx.sender,
+            gasPrice: tx.gasPrice,
+            gasLimit: tx.gasLimit,
+            data: tx.data,
+            signature: tx.signature,
+            sourceShard: tx.sourceShard,
+            destinationShard: tx.destinationShard,
+            blockNonce: tx.blockNonce,
+            blockHash: tx.blockHash,
+            miniblockHash: tx.miniblockHash,
+            timestamp: tx.timestamp,
+            status: tx.status,
+            hyperblockNonce: tx.hyperblockNonce,
+            hyperblockHash: tx.hyperblockHash,
+            receipt: EgldService.mapReceipt(tx.receipt),
+            smartContractResults: tx.smartContractResults.map(EgldService.mapSmartContractResults)        
+        };
     };
+
+    private static mapReceipt(rx: any) {
+        return {
+          value: rx.value,
+          sender: rx.sender,
+          data: rx.data,
+          txHash: rx.txHash,
+        };
+    }
+
+    private static mapSmartContractResults(sx: any) {
+        return {
+            hash: sx.hash,
+            nonce: sx.nonce,
+            value: sx.value,
+            receiver: sx.receiver,
+            sender: sx.sender,
+            data: sx.data,
+            prevTxHash: sx.prevTxHash,
+            originalTxHash: sx.originalTxHash,
+            gasLimit: sx.gasLimit,
+            gasPrice: sx.gasPrice,
+            callType: sx.callType,
+        };
+    }
 
     protected constructor(protected readonly logger: PinoLogger) {
     }
@@ -104,13 +166,6 @@ export abstract class EgldService {
             new EgldError(`Unable to broadcast transaction due to ${e.message}.`, 'egld.broadcast.failed');
             throw e;
         }
-
-        // const client = await this.getClient(await this.isTestnet());
-        // const result: { txId: string } = await new Promise((async (resolve, reject) => {
-        //     client.eth.sendSignedTransaction(txData)
-        //         .once('transactionHash', txId => resolve({txId}))
-        //         .on('error', e => reject(new EgldError(`Unable to broadcast transaction due to ${e.message}.`, 'egld.broadcast.failed')));
-        // }));
 
         if (signatureId) {
             try {
@@ -173,6 +228,18 @@ export abstract class EgldService {
         }
     }
 
+    public async getTransactionsByAccount(address: string, pageSize?: string, offset?: string, count?: string) {
+        const t = await this.isTestnet();
+        try {
+            const {transactions} = (await axios.get(`${await this.getFirstNodeUrl(t)}/address/${address}/transactions`,
+                {headers: {'Content-Type': 'application/json'}})).data;
+            return transactions;
+        } catch (e) {
+            this.logger.error(e);
+            throw new EgldError('Transactions count for account not found.', 'accountNonceTx.not.found');
+        }
+    }
+
     private async broadcastOrStoreKMSTransaction({
                                                      transactionData,
                                                      signatureId,
@@ -186,7 +253,7 @@ export abstract class EgldService {
         return this.broadcast(transactionData);
     }
 
-    public async web3Method(req: Request, key: string) {
+    public async nodeMethod(req: Request, key: string) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
         const path = req.url;
         const testnet = await this.isTestnet();
@@ -218,8 +285,8 @@ export abstract class EgldService {
         return {key};
     }
 
-    public async generateAddress(xpub: string, derivationIndex: string): Promise<{ address: string }> {
-        const address = await generateAddressFromXPub(Currency.EGLD, await this.isTestnet(), xpub, parseInt(derivationIndex));
+    public async generateAddress(mnem: string, derivationIndex: string): Promise<{ address: string }> {
+        const address = await generateAddressFromXPub(Currency.EGLD, await this.isTestnet(), mnem, parseInt(derivationIndex));
         return {address};
     }
 
@@ -250,15 +317,6 @@ export abstract class EgldService {
             index: transfer.nonce
         });
     }
-
-    // public async sendCustomErc20Transaction(transferCustomErc20: TransferCustomErc20): Promise<TransactionHash | SignatureId> {
-    //   const transactionData = await prepareXdcCustomErc20SignedTransaction(transferCustomErc20, await this.getFirstNodeUrl(await this.isTestnet()));
-    //     return this.broadcastOrStoreKMSTransaction({
-    //         transactionData,
-    //         signatureId: transferCustomErc20.signatureId,
-    //         index: transferCustomErc20.index
-    //     });
-    // }
 
     public async deploySmartContract(tx: EgldEsdtTransaction) {
         const transactionData = await prepareEgldDeployEsdtSignedTransaction(tx, await this.getFirstNodeUrl(await this.isTestnet()));
