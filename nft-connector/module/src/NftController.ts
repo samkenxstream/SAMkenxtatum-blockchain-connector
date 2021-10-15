@@ -35,7 +35,7 @@ export abstract class NftController {
     protected constructor(protected readonly service: NftService) {
     }
 
-    @Get('/balance/:chain/:contractAddress/:address')
+    @Get('/balance/:chain/:contractAddress/:address/:nonce?')
     public async getBalanceErc721(@Param() path: PathAddressContractAddressNonceChain) {
         try {
             return await this.service.getTokensOfOwner(path.chain, path.address, path.contractAddress, path.nonce);
@@ -62,7 +62,7 @@ export abstract class NftController {
         }
     }
 
-    @Get('/metadata/:chain/:contractAddress/:tokenId')
+    @Get('/metadata/:chain/:contractAddress/:tokenId/:nonce?')
     public async getMetadataErc721(@Param() path: PathTokenIdContractAddressNonceChain, @Query('account') account: string) {
         try {
             return await this.service.getMetadataErc721(path.chain, path.tokenId, path.contractAddress, account, path.nonce);
@@ -71,7 +71,7 @@ export abstract class NftController {
         }
     }
 
-    @Get('/royalty/:chain/:contractAddress/:tokenId')
+    @Get('/royalty/:chain/:contractAddress/:tokenId/:nonce?')
     public async getRoyaltyErc721(@Param() path: PathTokenIdContractAddressNonceChain) {
         try {
             return await this.service.getRoyaltyErc721(path.chain, path.tokenId, path.contractAddress, path.nonce);
