@@ -106,6 +106,7 @@ import {
     sendOneSmartContractReadMethodInvocationTransaction,
     SmartContractReadMethodInvocation
 } from '@tatumio/tatum';
+import erc721Provenance_abi from '@tatumio/tatum/dist/src/contracts/erc721Provenance/erc721Provenance_abi';
 import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
 import Web3 from 'web3';
 import { Transaction, TransactionReceipt } from 'web3-eth';
@@ -216,25 +217,7 @@ export abstract class NftService {
         body.contractAddress = contractAddress
         body.params = [tokenId]
         body.methodName = 'getTokenData'
-        body.methodABI = {
-            "inputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "tokenId",
-                    "type": "uint256"
-                }
-            ],
-            "name": "getTokenData",
-            "outputs": [
-                {
-                    "internalType": "string[]",
-                    "name": "",
-                    "type": "string[]"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        }
+        body.methodABI = erc721Provenance_abi.find((a: any) => a.name === 'getTokenData')
         switch (chain) {
             case Currency.ETH:
                 txData = await sendSmartContractReadMethodInvocationTransaction(body);
@@ -253,10 +236,8 @@ export abstract class NftService {
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
-            // @ts-ignore
-            txData = JSON.stringify(txData);
-            for (let i = 0; i < txData.length; i++) {
-                const t = txData.split("'''###'''", 2)
+            for (let i = 0; i < txData.data.length; i++) {
+                const t = txData.data[i].split("'''###'''", 2)
                 result.push({ provenanaceData: t[0], tokenPrice: t[1] })
             }
             return result

@@ -841,8 +841,6 @@ paths:
               - MATIC
               - ONE
               - CELO
-              - TRON
-              - FLOW
               - BSC
         - description: "Token ID"
           in: path
