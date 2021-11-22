@@ -3,22 +3,22 @@ servers:
   - url: 'https://api-eu1.tatum.io'
 info:
   version: 1.0.1
-  title: Tatum Polygon (Matic) API
+  title: Tatum Kcc (KCS) API
 tags:
   - description: |
-      <p>Polygon (Matic) is an Ethereum EVM 100% compatible blockchain, and is very good for decentralized application (Dapp) development within many possible verticals including DeFi, NFT, Gaming, and many others.<br/>
+      <p>Kcc (KCS) is an Ethereum EVM 100% compatible blockchain, and is very good for decentralized application (Dapp) development within many possible verticals including DeFi, NFT, Gaming, and many others.<br/>
       Tatum supports 2 chains:
       <ul><li>Mainnet - a regular live chain
       <li>Mumbai Testnet - a chain used for testing purposes. Coins on the test chain have no value and can be obtained from
-      a faucet, e.g. <a target="_blank" href="https://faucet.matic.network/">https://faucet.matic.network/</a></li></ul></p>
-    name: Blockchain / Polygon (Matic)
+      a faucet, e.g. <a target="_blank" href="https://faucet-testnet.kcc.network/">https://faucet-testnet.kcc.network/</a></li></ul></p>
+    name: Blockchain / Kcc (KCS)
 paths:
-  /v3/polygon/wallet:
+  /v3/kcc/wallet:
     get:
       description: |
-        <h4>1 credit per API call.</h4><br/><p>Tatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. Mnemonic phrase consists of 24 special words in defined order and can restore access to all generated addresses and private keys.<br/>Each address is identified by 3 main values:<ul><li>Private Key - your secret value, which should never be revealed</li><li>Public Key - public address to be published</li><li>Derivation index - index of generated address</li></ul></p><p>Tatum follows BIP44 specification and generates for Polygon wallet with derivation path m'/44'/966'/0'/0. More about BIP44 HD wallets can be found here - <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki">https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki</a>.
-        Generate BIP44 compatible Polygon wallet.</p>
-      operationId: PolygonGenerateWallet
+        <h4>1 credit per API call.</h4><br/><p>Tatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. Mnemonic phrase consists of 24 special words in defined order and can restore access to all generated addresses and private keys.<br/>Each address is identified by 3 main values:<ul><li>Private Key - your secret value, which should never be revealed</li><li>Public Key - public address to be published</li><li>Derivation index - index of generated address</li></ul></p><p>Tatum follows BIP44 specification and generates for Kcc wallet with derivation path m'/44'/966'/0'/0. More about BIP44 HD wallets can be found here - <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki">https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki</a>.
+        Generate BIP44 compatible Kcc wallet.</p>
+      operationId: KccGenerateWallet
       parameters:
         - description: "Mnemonic to use for generation of extended public and private keys."
           in: query
@@ -57,16 +57,16 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Generate Polygon wallet
+      summary: Generate Kcc wallet
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/address/{xpub}/{index}:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/address/{xpub}/{index}:
     get:
       description: |
         <h4>1 credit per API call.</h4><br/>
-        <p>Generate Polygon account deposit address from Extended public key. Deposit address is generated for the specific index - each extended public key can generate
+        <p>Generate Kcc account deposit address from Extended public key. Deposit address is generated for the specific index - each extended public key can generate
         up to 2^31 addresses starting from index 0 until 2^31.</p>
-      operationId: PolygonGenerateAddress
+      operationId: KccGenerateAddress
       parameters:
         - description: "Extended public key of wallet."
           in: path
@@ -91,7 +91,7 @@ paths:
                 properties:
                   address:
                     type: string
-                    description: Polygon address
+                    description: Kcc address
                     example: "0xa7673161CbfE0116A4De9E341f8465940c2211d4"
           description: OK
         400:
@@ -103,16 +103,16 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Generate Polygon account address from Extended public key
+      summary: Generate Kcc account address from Extended public key
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/wallet/priv:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/wallet/priv:
     post:
       description: |
         <h4>1 credit per API call.</h4><br/>
         <p>Generate private key of address from mnemonic for given derivation path index. Private key is generated for the specific index - each mnemonic
         can generate up to 2^31 private keys starting from index 0 until 2^31.</p>
-      operationId: PolygonGenerateAddressPrivateKey
+      operationId: KccGenerateAddressPrivateKey
       requestBody:
         content:
           application/json:
@@ -135,16 +135,16 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Generate Polygon private key
+      summary: Generate Kcc private key
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/web3/{xApiKey}:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/web3/{xApiKey}:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Use this endpoint URL as a http-based web3 driver to connect directly to the Polygon node provided by Tatum.
-        To learn more about Polygon Web3, please visit <a href="https://docs.matic.network/" target="_blank">Polygon developer's guide.</a></p>
-      operationId: PolygonWeb3Driver
+        <p>Use this endpoint URL as a http-based web3 driver to connect directly to the Kcc node provided by Tatum.
+        To learn more about Kcc Web3, please visit <a href="https://docs.kcc.io/" target="_blank">Kcc developer's guide.</a></p>
+      operationId: KccWeb3Driver
       parameters:
         - description: "Tatum X-API-Key used for authorization."
           in: path
@@ -179,11 +179,11 @@ paths:
       x-code-samples:
       summary: Web3 HTTP driver
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/block/current:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/block/current:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get Polygon current block number. This is the number of the latest block in the blockchain.</p>"
-      operationId: PolygonGetCurrentBlock
+      description: "<h4>1 credit per API call.</h4><br/><p>Get Kcc current block number. This is the number of the latest block in the blockchain.</p>"
+      operationId: KccGetCurrentBlock
       responses:
         200:
           content:
@@ -202,11 +202,11 @@ paths:
       x-code-samples:
       summary: Get current block number
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/block/{hash}:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/block/{hash}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get Polygon block by block hash or block number.</p>"
-      operationId: PolygonGetBlock
+      description: "<h4>1 credit per API call.</h4><br/><p>Get Kcc block by block hash or block number.</p>"
+      operationId: KccGetBlock
       parameters:
         - description: "Block hash or block number"
           in: path
@@ -231,13 +231,13 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get Polygon block by hash
+      summary: Get Kcc block by hash
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/account/balance/{address}:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/account/balance/{address}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get Polygon account balance in MATIC. This method does not prints any balance of the ERC20 or ERC721 tokens on the account.</p>"
-      operationId: PolygonGetBalance
+      description: "<h4>1 credit per API call.</h4><br/><p>Get Kcc account balance in KCS. This method does not prints any balance of the ERC20 or ERC721 tokens on the account.</p>"
+      operationId: KccGetBalance
       parameters:
         - description: "Account address"
           in: path
@@ -255,7 +255,7 @@ paths:
                 properties:
                   balance:
                     type: string
-                    description: Balance in MATIC
+                    description: Balance in KCS
                     example: "10.52"
           description: OK
         400:
@@ -267,13 +267,13 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get Polygon Account balance
+      summary: Get Kcc Account balance
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/transaction/{hash}:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/transaction/{hash}:
     get:
-      description: "<h4>2 credit per API call.</h4><br/><p>Get Polygon transaction by transaction hash.</p>"
-      operationId: PolygonGetTransaction
+      description: "<h4>2 credit per API call.</h4><br/><p>Get Kcc transaction by transaction hash.</p>"
+      operationId: KccGetTransaction
       parameters:
         - description: "Transaction hash"
           in: path
@@ -287,7 +287,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PolygonTx"
+                $ref: "#/components/schemas/KccTx"
           description: OK
         400:
           <<: *API400
@@ -305,13 +305,13 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get Polygon Transaction
+      summary: Get Kcc Transaction
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/account/transaction/{address}:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/account/transaction/{address}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get Polygon transactions by address. This includes incoming and outgoing transactions for the address.</p>"
-      operationId: PolygonGetTransactionByAddress
+      description: "<h4>1 credit per API call.</h4><br/><p>Get Kcc transactions by address. This includes incoming and outgoing transactions for the address.</p>"
+      operationId: KccGetTransactionByAddress
       parameters:
         - description: "Account address"
           in: path
@@ -366,7 +366,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PolygonTx"
+                  $ref: "#/components/schemas/KccTx"
           description: OK
         400:
           <<: *API400
@@ -377,17 +377,17 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get Polygon transactions by address
+      summary: Get Kcc transactions by address
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/transaction/count/{address}:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/transaction/count/{address}:
     get:
       description: |
         <h4>1 credit per API call.</h4><br/>
-        <p>Get a number of outgoing Polygon transactions for the address. When a transaction is sent, there can be multiple outgoing transactions,
+        <p>Get a number of outgoing Kcc transactions for the address. When a transaction is sent, there can be multiple outgoing transactions,
         which are not yet processed by the blockchain. To distinguish between them, there is a counter called a nonce, which represents
         the order of the transaction in the list of outgoing transactions.</p>
-      operationId: PolygonGetTransactionCount
+      operationId: KccGetTransactionCount
       parameters:
         - description: "address"
           in: path
@@ -416,28 +416,28 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get count of outgoing Polygon transactions
+      summary: Get count of outgoing Kcc transactions
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/transaction:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/transaction:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Send MATIC from account to account.<br/><br/>
+        <p>Send KCS from account to account.<br/><br/>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: PolygonBlockchainTransfer
+      operationId: KccBlockchainTransfer
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/TransferPolygonBlockchain"
-                - $ref: "#/components/schemas/TransferPolygonBlockchainKMS"
+                - $ref: "#/components/schemas/TransferKccBlockchain"
+                - $ref: "#/components/schemas/TransferKccBlockchainKMS"
         required: true
       responses:
         200:
@@ -458,32 +458,32 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Error403PolygonBroadcast"
-                  - $ref: "#/components/schemas/Error403PolygonGasPrice"
-                  - $ref: "#/components/schemas/Error403PolygonTxBody"
-                  - $ref: "#/components/schemas/Error403PolygonGasCalculation"
-                  - $ref: "#/components/schemas/Error403PolygonTxHash"
-                  - $ref: "#/components/schemas/Error403PolygonTxSign"
+                  - $ref: "#/components/schemas/Error403KccBroadcast"
+                  - $ref: "#/components/schemas/Error403KccGasPrice"
+                  - $ref: "#/components/schemas/Error403KccTxBody"
+                  - $ref: "#/components/schemas/Error403KccGasCalculation"
+                  - $ref: "#/components/schemas/Error403KccTxHash"
+                  - $ref: "#/components/schemas/Error403KccTxSign"
         500:
           <<: *API500
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Send MATIC from account to account
+      summary: Send KCS from account to account
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/gas:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/gas:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Estimate gasLimit and gasPrice of the Polygon transaction. Gas price is obtained from <a href="https://gasstation-mainnet.matic.network/" target="_blank">https://gasstation-mainnet.matic.network/</a>.
+        <p>Estimate gasLimit and gasPrice of the Kcc transaction.
         </p>
-      operationId: PolygonEstimateGas
+      operationId: KccEstimateGas
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PolygonEstimateGas"
+              $ref: "#/components/schemas/KccEstimateGas"
         required: true
       responses:
         200:
@@ -514,17 +514,17 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Error403PolygonTxBody"
-                  - $ref: "#/components/schemas/Error403PolygonGasCalculation"
+                  - $ref: "#/components/schemas/Error403KccTxBody"
+                  - $ref: "#/components/schemas/Error403KccGasCalculation"
         500:
           <<: *API500
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Estimate Polygon transaction fees
+      summary: Estimate Kcc transaction fees
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/smartcontract:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/smartcontract:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
@@ -535,15 +535,15 @@ paths:
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.</p>
-      operationId: PolygonBlockchainSmartContractInvocation
+      operationId: KccBlockchainSmartContractInvocation
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/CallPolygonSmartContractReadMethod"
-                - $ref: "#/components/schemas/CallPolygonSmartContractMethod"
-                - $ref: "#/components/schemas/CallPolygonSmartContractMethodKMS"
+                - $ref: "#/components/schemas/CallKccSmartContractReadMethod"
+                - $ref: "#/components/schemas/CallKccSmartContractMethod"
+                - $ref: "#/components/schemas/CallKccSmartContractMethodKMS"
         required: true
       responses:
         200:
@@ -565,12 +565,12 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Error403PolygonBroadcast"
-                  - $ref: "#/components/schemas/Error403PolygonGasPrice"
-                  - $ref: "#/components/schemas/Error403PolygonScBody"
-                  - $ref: "#/components/schemas/Error403PolygonGasCalculation"
-                  - $ref: "#/components/schemas/Error403PolygonTxHash"
-                  - $ref: "#/components/schemas/Error403PolygonTxSign"
+                  - $ref: "#/components/schemas/Error403KccBroadcast"
+                  - $ref: "#/components/schemas/Error403KccGasPrice"
+                  - $ref: "#/components/schemas/Error403KccScBody"
+                  - $ref: "#/components/schemas/Error403KccGasCalculation"
+                  - $ref: "#/components/schemas/Error403KccTxHash"
+                  - $ref: "#/components/schemas/Error403KccTxSign"
         500:
           <<: *API500
       security:
@@ -578,14 +578,14 @@ paths:
       x-code-samples:
       summary: Invoke Smart Contract method
       tags:
-        - Blockchain / Polygon (Matic)
-  /v3/polygon/broadcast:
+        - Blockchain / Kcc (KCS)
+  /v3/kcc/broadcast:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Broadcast signed transaction to Polygon blockchain. This method is used internally from Tatum KMS or Tatum client libraries.
+        <p>Broadcast signed transaction to Kcc blockchain. This method is used internally from Tatum KMS or Tatum client libraries.
         It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchian.</p>
-      operationId: PolygonBroadcast
+      operationId: KccBroadcast
       requestBody:
         content:
           application/json:
@@ -608,15 +608,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error403PolygonBroadcast"
+                $ref: "#/components/schemas/Error403KccBroadcast"
         500:
           <<: *API500
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Broadcast signed Polygon transaction
+      summary: Broadcast signed Kcc transaction
       tags:
-        - Blockchain / Polygon (Matic)
+        - Blockchain / Kcc (KCS)
 components:
   securitySchemes:
     X-Api-Key:
@@ -628,7 +628,7 @@ components:
       name: x-api-key
       type: apiKey
   schemas:
-    PolygonBlock:
+    KccBlock:
       type: object
       properties:
         difficulty:
@@ -703,12 +703,12 @@ components:
           description: Array of transactions.
           type: array
           items:
-            $ref: "#/components/schemas/PolygonTx"
+            $ref: "#/components/schemas/KccTx"
         transactionsRoot:
           description: The root of the transaction trie of the block.
           type: string
           example: "0x5990081ef8515d561b50255af03c5d505f7725ddef27405dc67d23bfd0f47704"
-    PolygonTx:
+    KccTx:
       type: object
       properties:
         blockHash:
@@ -808,11 +808,11 @@ components:
                 type: string
                 description: Hash of the transaction this event was created in.
                 example: "0xe6e7340394958674cdf8606936d292f565e4ecc476aaa8b258ec8a141f7c75d7"
-    Error403PolygonBroadcast:
+    Error403KccBroadcast:
       properties:
         errorCode:
-          description: polygon.broadcast.failed
-          example: polygon.broadcast.failed
+          description: kcc.broadcast.failed
+          example: kcc.broadcast.failed
           type: string
         message:
           description: Unable to broadcast transaction due to ${error}.
@@ -827,7 +827,7 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonBep20NotFound:
+    Error403KccBep20NotFound:
       properties:
         errorCode:
           description: erc20.token.notFound
@@ -865,7 +865,7 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonBep20Set:
+    Error403KccBep20Set:
       properties:
         errorCode:
           description: erc20.address.set
@@ -884,7 +884,7 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonMnemonicPrivateKey:
+    Error403KccMnemonicPrivateKey:
       properties:
         errorCode:
           description: private.mnemonic.missing
@@ -903,11 +903,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonBep20Unsupported:
+    Error403KccBep20Unsupported:
       properties:
         errorCode:
-          description: polygon.bep20.unsupported
-          example: polygon.bep20.unsupported
+          description: kcc.bep20.unsupported
+          example: kcc.bep20.unsupported
           type: string
         message:
           description: Unsupported ETH ERC20 blockchain.
@@ -922,11 +922,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonTxHash:
+    Error403KccTxHash:
       properties:
         errorCode:
-          description: polygon.transaction.hash
-          example: polygon.transaction.hash
+          description: kcc.transaction.hash
+          example: kcc.transaction.hash
           type: string
         message:
           description: Unable to calculate transaction hash. ${error}
@@ -941,11 +941,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonTxSign:
+    Error403KccTxSign:
       properties:
         errorCode:
-          description: polygon.transaction.sign
-          example: polygon.transaction.sign
+          description: kcc.transaction.sign
+          example: kcc.transaction.sign
           type: string
         message:
           description: Unable to sign transaction. ${error}
@@ -960,11 +960,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonErc20TxSign:
+    Error403KccErc20TxSign:
       properties:
         errorCode:
-          description: polygon.bep20.sign
-          example: polygon.bep20.sign
+          description: kcc.bep20.sign
+          example: kcc.bep20.sign
           type: string
         message:
           description: Unable to sign transaction for contract creation. ${error}
@@ -979,11 +979,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonGasCalculation:
+    Error403KccGasCalculation:
       properties:
         errorCode:
-          description: polygon.transaction.gas
-          example: polygon.transaction.gas
+          description: kcc.transaction.gas
+          example: kcc.transaction.gas
           type: string
         message:
           description: Unable to calculate gas limit for transaction. ${error}
@@ -998,11 +998,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonTxBody:
+    Error403KccTxBody:
       properties:
         errorCode:
-          description: polygon.transaction.body
-          example: polygon.transaction.body
+          description: kcc.transaction.body
+          example: kcc.transaction.body
           type: string
         message:
           description: Either currency, or tokenAddress must be defined.
@@ -1017,11 +1017,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonScBody:
+    Error403KccScBody:
       properties:
         errorCode:
-          description: polygon.sc.invalid
-          example: polygon.sc.invalid
+          description: kcc.sc.invalid
+          example: kcc.sc.invalid
           type: string
         message:
           description: Invalid parameters for smart contract invocation.
@@ -1036,7 +1036,7 @@ components:
         - message
         - statusCode
       type: object
-    Error403PolygonGasPrice:
+    Error403KccGasPrice:
       properties:
         errorCode:
           description: gas.price.failed
@@ -1090,7 +1090,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Kcc transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1154,7 +1154,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Kcc transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1178,7 +1178,7 @@ components:
         - signatureId
         - digits
         - amount
-    CallPolygonSmartContractMethod:
+    CallKccSmartContractMethod:
       type: object
       properties:
         contractAddress:
@@ -1229,7 +1229,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Kcc transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1253,7 +1253,7 @@ components:
         - methodABI
         - fromPrivateKey
         - methodName
-    CallPolygonSmartContractReadMethod:
+    CallKccSmartContractReadMethod:
       type: object
       properties:
         contractAddress:
@@ -1295,7 +1295,7 @@ components:
         - params
         - methodABI
         - methodName
-    CallPolygonSmartContractMethodKMS:
+    CallKccSmartContractMethodKMS:
       type: object
       properties:
         contractAddress:
@@ -1332,7 +1332,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Kcc transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1356,7 +1356,7 @@ components:
         - methodABI
         - signatureId
         - methodName
-    TransferPolygonBlockchain:
+    TransferKccBlockchain:
       type: object
       properties:
         data:
@@ -1367,7 +1367,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Kcc transaction. If not present, last known nonce will be used.
         to:
           description: Blockchain address to send assets
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
@@ -1375,12 +1375,12 @@ components:
           minLength: 42
           type: string
         currency:
-          description: Currency to transfer from Polygon Blockchain Account. ERC20 tokens USDC and USDT are available only for mainnet use.
+          description: Currency to transfer from Kcc Blockchain Account. ERC20 tokens USDC and USDT are available only for mainnet use.
           enum:
-            - MATIC
-            - USDC_MATIC
-            - USDT_MATIC
-          example: MATIC
+            - KCS
+            - USDC_KCS
+            - USDT_KCS
+          example: KCS
           type: string
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
@@ -1415,7 +1415,7 @@ components:
         - amount
         - currency
         - fromPrivateKey
-    PolygonEstimateGas:
+    KccEstimateGas:
       type: object
       properties:
         from:
@@ -1445,7 +1445,7 @@ components:
         - to
         - amount
         - from
-    TransferPolygonBlockchainKMS:
+    TransferKccBlockchainKMS:
       type: object
       properties:
         data:
@@ -1456,7 +1456,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Kcc transaction. If not present, last known nonce will be used.
         to:
           description: Blockchain address to send assets
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
@@ -1464,7 +1464,7 @@ components:
           minLength: 42
           type: string
         currency:
-          description: Currency to transfer from Polygon Blockchain Account. ERC20 tokens BETH, BBTC, BADA, WMATIC, BDOT, BXRP, BLTC, BBCH are available only for mainnet use.
+          description: Currency to transfer from Kcc Blockchain Account. ERC20 tokens BETH, BBTC, BADA, WMATIC, BDOT, BXRP, BLTC, BBCH, KCS are available only for mainnet use.
           enum:
             - BETH
             - BBTC
@@ -1475,7 +1475,8 @@ components:
             - BLTC
             - BBCH
             - MATIC
-          example: MATIC
+            - KCS
+          example: KCS
           type: string
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
@@ -1550,13 +1551,13 @@ components:
           minimum: 1
           type: number
         address:
-          description: Address on Polygon blockchain, where all created ERC20 tokens will be transferred.
+          description: Address on Kcc blockchain, where all created ERC20 tokens will be transferred.
           maxLength: 42
           minLength: 42
           example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
           type: string
         fromPrivateKey:
-          description: Private key of Polygon account address, from which the fee for the deployment of ERC20 will be paid. Private key, or signature Id must be present.
+          description: Private key of Kcc account address, from which the fee for the deployment of ERC20 will be paid. Private key, or signature Id must be present.
           type: string
           example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
           maxLength: 66
@@ -1564,7 +1565,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Kcc transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1624,7 +1625,7 @@ components:
           minimum: 1
           type: number
         address:
-          description: Address on Polygon blockchain, where all created ERC20 tokens will be transferred.
+          description: Address on Kcc blockchain, where all created ERC20 tokens will be transferred.
           maxLength: 42
           minLength: 42
           example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
@@ -1643,7 +1644,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Kcc transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object

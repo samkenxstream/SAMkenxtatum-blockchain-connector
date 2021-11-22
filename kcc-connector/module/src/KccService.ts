@@ -5,10 +5,10 @@ import {
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
     generateWallet,
-    polygonGetGasPriceInWei,
-    preparePolygonSignedTransaction,
-    preparePolygonSmartContractWriteMethodInvocation,
-    sendPolygonSmartContractReadMethodInvocationTransaction,
+    kccGetGasPriceInWei,
+    prepareKccSignedTransaction,
+    prepareKccSmartContractWriteMethodInvocation,
+    sendKccSmartContractReadMethodInvocationTransaction,
     SignatureId,
     SmartContractMethodInvocation,
     SmartContractReadMethodInvocation,
@@ -19,10 +19,10 @@ import {BroadcastOrStoreKMSTransaction} from '@tatumio/blockchain-connector-comm
 import Web3 from 'web3';
 import {fromWei} from 'web3-utils';
 import axios from 'axios';
-import {PolygonError} from './PolygonError';
+import {KccError} from './KccError';
 import BigNumber from 'bignumber.js';
 
-export abstract class PolygonService {
+export abstract class KccService {
 
     public static mapBlock(block: any) {
         return {
@@ -41,7 +41,7 @@ export abstract class PolygonService {
             stateRoot: block.stateRoot,
             timestamp: parseInt(block.timestamp, 16),
             totalDifficulty: parseInt(block.totalDifficulty, 16),
-            transactions: block.transactions.map(PolygonService.mapTransaction),
+            transactions: block.transactions.map(KccService.mapTransaction),
             uncles: block.uncles,
         };
     }
@@ -85,7 +85,7 @@ export abstract class PolygonService {
     public async getFirstNodeUrl(testnet: boolean): Promise<string> {
         const nodes = await this.getNodesUrl(testnet);
         if (nodes.length === 0) {
-            new PolygonError('Nodes url array must have at least one element.', 'polygon.nodes.url');
+            new KccError('Nodes url array must have at least one element.', 'kcc.nodes.url');
         }
         return nodes[0];
     }
@@ -98,7 +98,7 @@ export abstract class PolygonService {
         txId: string,
         failed?: boolean,
     }> {
-        this.logger.info(`Broadcast tx for MATIC with data '${txData}'`);
+        this.logger.info(`Broadcast tx for KCS with data '${txData}'`);
         let txId;
         try {
             const url = await this.getFirstNodeUrl(await this.isTestnet());
@@ -109,15 +109,15 @@ export abstract class PolygonService {
                 params: [txData]
             }, {headers: {'Content-Type': 'application/json'}})).data;
             if (error) {
-                throw new PolygonError(`Unable to broadcast transaction due to ${error.message}.`, 'polygon.broadcast.failed');
+                throw new KccError(`Unable to broadcast transaction due to ${error.message}.`, 'kcc.broadcast.failed');
             }
             txId = result;
         } catch (e) {
-            if (e.constructor.name === PolygonError.name) {
+            if (e.constructor.name === KccError.name) {
                 throw e;
             }
             this.logger.error(e);
-            throw new PolygonError(`Unable to broadcast transaction due to ${e.message}.`, 'polygon.broadcast.failed');
+            throw new KccError(`Unable to broadcast transaction due to ${e.message}.`, 'kcc.broadcast.failed');
         }
 
         if (signatureId) {
@@ -150,7 +150,7 @@ export abstract class PolygonService {
                     true
                 ]
             }, {headers: {'Content-Type': 'application/json'}})).data.result;
-            return PolygonService.mapBlock(block);
+            return KccService.mapBlock(block);
         } catch (e) {
             this.logger.error(e);
             throw e;
@@ -169,7 +169,7 @@ export abstract class PolygonService {
                 ]
             }, {headers: {'Content-Type': 'application/json'}})).data;
             if (!data?.result) {
-                throw new PolygonError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
+                throw new KccError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
             }
             const {r, s, v, hash, ...transaction} = data.result;
             let receipt = {};
@@ -185,10 +185,10 @@ export abstract class PolygonService {
             } catch (_) {
                 transaction.transactionHash = hash;
             }
-            return PolygonService.mapTransaction({...transaction, ...receipt, hash});
+            return KccService.mapTransaction({...transaction, ...receipt, hash});
         } catch (e) {
             this.logger.error(e);
-            throw new PolygonError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
+            throw new KccError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
         }
     }
 
@@ -199,7 +199,7 @@ export abstract class PolygonService {
                                                  }: BroadcastOrStoreKMSTransaction) {
         if (signatureId) {
             return {
-                signatureId: await this.storeKMSTransaction(transactionData, Currency.MATIC, [signatureId], index),
+                signatureId: await this.storeKMSTransaction(transactionData, Currency.KCS, [signatureId], index),
             };
         }
         return this.broadcast(transactionData);
@@ -211,16 +211,16 @@ export abstract class PolygonService {
     }
 
     public async generateWallet(mnemonic?: string) {
-        return generateWallet(Currency.MATIC, await this.isTestnet(), mnemonic);
+        return generateWallet(Currency.KCS, await this.isTestnet(), mnemonic);
     }
 
     public async generatePrivateKey(mnemonic: string, index: number) {
-        const key = await generatePrivateKeyFromMnemonic(Currency.MATIC, await this.isTestnet(), mnemonic, index);
+        const key = await generatePrivateKeyFromMnemonic(Currency.KCS, await this.isTestnet(), mnemonic, index);
         return {key};
     }
 
     public async generateAddress(xpub: string, derivationIndex: string): Promise<{ address: string }> {
-        const address = await generateAddressFromXPub(Currency.MATIC, await this.isTestnet(), xpub, parseInt(derivationIndex));
+        const address = await generateAddressFromXPub(Currency.KCS, await this.isTestnet(), xpub, parseInt(derivationIndex));
         return {address};
     }
 
@@ -228,7 +228,7 @@ export abstract class PolygonService {
         const client = await this.getClient(await this.isTestnet());
         return {
             gasLimit: await client.eth.estimateGas(body),
-            gasPrice: await polygonGetGasPriceInWei(),
+            gasPrice: await kccGetGasPriceInWei(),
         };
     }
 
@@ -238,7 +238,7 @@ export abstract class PolygonService {
     }
 
     public async sendMatic(transfer: TransferErc20): Promise<TransactionHash | SignatureId> {
-        const transactionData = await preparePolygonSignedTransaction(await this.isTestnet(), transfer, await this.getFirstNodeUrl(await this.isTestnet()));
+        const transactionData = await prepareKccSignedTransaction(await this.isTestnet(), transfer, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
             transactionData, signatureId: transfer.signatureId,
             index: transfer.index
@@ -253,10 +253,10 @@ export abstract class PolygonService {
     public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation | SmartContractReadMethodInvocation) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
         if (smartContractMethodInvocation.methodABI.stateMutability === 'view') {
-            return sendPolygonSmartContractReadMethodInvocationTransaction(await this.isTestnet(), smartContractMethodInvocation, node);
+            return sendKccSmartContractReadMethodInvocationTransaction(await this.isTestnet(), smartContractMethodInvocation, node);
         }
 
-        const transactionData = await preparePolygonSmartContractWriteMethodInvocation(await this.isTestnet(), smartContractMethodInvocation, node);
+        const transactionData = await prepareKccSmartContractWriteMethodInvocation(await this.isTestnet(), smartContractMethodInvocation, node);
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
             signatureId: (smartContractMethodInvocation as SmartContractMethodInvocation).signatureId,

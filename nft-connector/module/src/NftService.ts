@@ -1,11 +1,28 @@
-import axios, { AxiosRequestConfig } from 'axios';
-import { PinoLogger } from 'nestjs-pino';
+import axios from 'axios';
+import {PinoLogger} from 'nestjs-pino';
 import BigNumber from 'bignumber.js';
 import * as fcl from '@onflow/fcl';
 import * as sdk from '@onflow/sdk';
-import { NftError } from './NftError';
-import { HarmonyAddress } from '@harmony-js/crypto';
+import {NftError} from './NftError';
+import {HarmonyAddress} from '@harmony-js/crypto';
+import erc721Provenance_abi from '@tatumio/tatum/dist/src/contracts/erc721Provenance/erc721Provenance_abi';
+import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
+import Web3 from 'web3';
+import {Transaction, TransactionReceipt} from 'web3-eth';
+import {FlowTxType,} from '@tatumio/tatum/dist/src/transaction/flow';
 import {
+    prepareOneBurn721SignedTransaction,
+    prepareOneDeploy721SignedTransaction,
+    prepareOneMint721SignedTransaction,
+    prepareOneMintCashback721SignedTransaction,
+    prepareOneMintMultiple721SignedTransaction,
+    prepareOneMintMultipleCashback721SignedTransaction,
+    prepareOneTransfer721SignedTransaction,
+    prepareOneUpdateCashbackForAuthor721SignedTransaction
+} from '@tatumio/tatum/dist/src/transaction/one';
+import {ChainEgldEsdtTransaction} from './dto/ChainEgldEsdtTransaction';
+import {
+    AddMinter,
     CeloBurnErc721,
     CeloDeployErc721,
     CeloMintErc721,
@@ -104,24 +121,14 @@ import {
     sendBscSmartContractReadMethodInvocationTransaction,
     sendPolygonSmartContractReadMethodInvocationTransaction,
     sendOneSmartContractReadMethodInvocationTransaction,
-    SmartContractReadMethodInvocation
+    SmartContractReadMethodInvocation, prepareAddNFTMinter, DeployErc721,
+    prepareAlgoCreateNFTSignedTransaction,
+    getAlgoClient,
+    BurnErc721,
+    prepareAlgoBurnNFTSignedTransaction,
+    TransferErc721,
+    prepareAlgoTransferNFTSignedTransaction
 } from '@tatumio/tatum';
-import erc721Provenance_abi from '@tatumio/tatum/dist/src/contracts/erc721Provenance/erc721Provenance_abi';
-import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
-import Web3 from 'web3';
-import { Transaction, TransactionReceipt } from 'web3-eth';
-import { FlowTxType, } from '@tatumio/tatum/dist/src/transaction/flow';
-import {
-    prepareOneBurn721SignedTransaction,
-    prepareOneDeploy721SignedTransaction,
-    prepareOneMint721SignedTransaction,
-    prepareOneMintCashback721SignedTransaction,
-    prepareOneMintMultiple721SignedTransaction,
-    prepareOneMintMultipleCashback721SignedTransaction,
-    prepareOneTransfer721SignedTransaction,
-    prepareOneUpdateCashbackForAuthor721SignedTransaction
-} from '@tatumio/tatum/dist/src/transaction/one';
-import { ChainEgldEsdtTransaction } from './dto/ChainEgldEsdtTransaction'
 
 export abstract class NftService {
 
@@ -137,7 +144,7 @@ export abstract class NftService {
     protected abstract getTronClient(testnet: boolean): Promise<any>;
 
     protected abstract getNodesUrl(chain: Currency, testnet: boolean): Promise<string[]>;
-
+    
     protected abstract broadcast(chain: Currency, txData: string, signatureId?: string);
 
     protected abstract deployFlowNft(testnet: boolean, body: FlowDeployNft): Promise<TransactionHash>;
@@ -362,7 +369,7 @@ export abstract class NftService {
     }
 
     public async transferErc721(
-        body: CeloTransferErc721 | EthTransferErc721 | FlowTransferNft | TronTransferTrc721 | OneTransfer721 | ChainEgldEsdtTransaction
+        body: CeloTransferErc721 | EthTransferErc721 | FlowTransferNft | TronTransferTrc721 | OneTransfer721 | ChainEgldEsdtTransaction | TransferErc721
     ): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
@@ -398,6 +405,9 @@ export abstract class NftService {
                     return this.wrapFlowCall(async (proposer, payer) =>
                         await sendFlowNftTransferToken(testnet, body as FlowTransferNft, proposer, payer));
                 }
+                break;
+            case Currency.ALGO:
+                txData = await prepareAlgoTransferNFTSignedTransaction(testnet, body as TransferErc721, provider);
                 break;
             // case Currency.XDC:
             //     txData = await prepareXdcTransferErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
@@ -514,6 +524,19 @@ export abstract class NftService {
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
+        if (body.signatureId) {
+            return { signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index) };
+        } else {
+            return this.broadcast(chain, txData);
+        }
+    }
+
+
+    public async addMinter(body: AddMinter): Promise<TransactionHash | { signatureId: string } | { txId: string, tokenId: number }> {
+        const testnet = await this.isTestnet();
+        const { chain } = body;
+        const provider = (await this.getNodesUrl(chain, testnet))[0];
+        const txData = await prepareAddNFTMinter(testnet, body, provider);
         if (body.signatureId) {
             return { signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index) };
         } else {
@@ -659,7 +682,7 @@ export abstract class NftService {
     }
 
     public async burnErc721(
-        body: CeloBurnErc721 | EthBurnErc721 | FlowBurnNft | TronBurnTrc721 | OneBurn721 | ChainEgldEsdtTransaction
+        body: CeloBurnErc721 | EthBurnErc721 | FlowBurnNft | TronBurnTrc721 | OneBurn721 | ChainEgldEsdtTransaction | BurnErc721
     ): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
@@ -695,6 +718,9 @@ export abstract class NftService {
                     return this.wrapFlowCall(async (proposer, payer) => await sendFlowNftBurnToken(testnet, body as FlowBurnNft, proposer, payer));
                 }
                 break;
+            case Currency.ALGO:
+                txData = await prepareAlgoBurnNFTSignedTransaction(testnet, body as BurnErc721, provider);
+                break;
             // case Currency.XDC:
             //     txData = await prepareXdcBurnErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
             //     break;
@@ -709,7 +735,7 @@ export abstract class NftService {
     }
 
     public async deployErc721(
-        body: CeloDeployErc721 | EthDeployErc721 | FlowDeployNft | TronDeployTrc721 | OneDeploy721 | ChainEgldEsdtTransaction
+        body: CeloDeployErc721 | EthDeployErc721 | FlowDeployNft | TronDeployTrc721 | OneDeploy721 | ChainEgldEsdtTransaction | DeployErc721
     ): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
@@ -740,6 +766,10 @@ export abstract class NftService {
                 break;
             case Currency.FLOW:
                 return await this.deployFlowNft(testnet, body as FlowDeployNft);
+                break;
+            case Currency.ALGO:
+                txData = await prepareAlgoCreateNFTSignedTransaction(testnet, body as DeployErc721, provider)
+                break;
             // case Currency.XDC:
             //     txData = await prepareXdcDeployErc721SignedTransaction(body as EthDeployErc721, (await this.getNodesUrl(chain, testnet))[0]);
             //     break;
@@ -774,6 +804,8 @@ export abstract class NftService {
             return;
         } else if (chain === Currency.TRON) {
             return this.getTronClient(testnet);
+        } else if (chain === Currency.ALGO) {
+            return await getAlgoClient(await this.isTestnet(), (await this.getNodesUrl(chain, testnet))[0]);
         }
         return new Web3(url);
     }

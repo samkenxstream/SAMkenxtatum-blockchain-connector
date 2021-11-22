@@ -2,6 +2,7 @@ import { BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post, Put,
 import {MultiTokenService} from './MultiTokenService';
 import {MultiTokenError} from './MultiTokenError';
 import {
+    AddMinter,
     CeloBurnMultiToken,
     CeloBurnMultiTokenBatch,
     CeloDeployMultiToken,
@@ -21,6 +22,7 @@ import {
     OneTransferMultiTokenBatch,
     TransferMultiToken,
     TransferMultiTokenBatch,
+    BurnMultiToken
 } from '@tatumio/tatum';
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 import {PathTokenIdContractAddressChain} from './dto/PathTokenIdContractAddressChain';
@@ -121,6 +123,23 @@ export abstract class MultiTokenController {
             throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
+
+    @Post('/mint/add')
+    @HttpCode(HttpStatus.OK)
+    public async addMinter(@Body() body: AddMinter) {
+        try {
+            return await this.service.addMinter(body);
+        } catch (e) {
+            if (['Array', 'MultiTokenError', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError') {
+                throw e;
+            }
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
+        }
+    }
+
     @Post('/mint/batch')
     @HttpCode(HttpStatus.OK)
     public async mintMultiTokenBatch(@Body() body: CeloMintMultiTokenBatch | MintMultiTokenBatch | OneMintMultiTokenBatch) {
@@ -139,7 +158,7 @@ export abstract class MultiTokenController {
 
     @Post('/burn')
     @HttpCode(HttpStatus.OK)
-    public async burnMultiToken(@Body() body: CeloBurnMultiToken | EthBurnMultiToken | OneBurnMultiToken) {
+    public async burnMultiToken(@Body() body: CeloBurnMultiToken | EthBurnMultiToken | OneBurnMultiToken | BurnMultiToken) {
         try {
             return await this.service.burnMultiToken(body);
         } catch (e) {

@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.0.3
+  version: 1.0.4
   title: Tatum ERC20 Abstraction API
 tags:
   - description: |
@@ -16,6 +16,7 @@ tags:
       <li><b>Celo</b></li>
       <li><b>Harmony.ONE</b></li>
       <li><b>XDC Network (XinFin)</b></li>
+      <li><b>Algorand</b></li>
       </ul>
       </p>
     name: Blockchain / Fungible Token
@@ -318,6 +319,8 @@ paths:
           application/json:
             schema:
               oneOf:
+                - $ref: "#/components/schemas/ChainTransferAlgoErc20"
+                - $ref: "#/components/schemas/ChainTransferAlgoErc20KMS"
                 - $ref: "#/components/schemas/ChainTransferEthErc20"
                 - $ref: "#/components/schemas/ChainTransferEthErc20KMS"
                 - $ref: "#/components/schemas/ChainTransferBscBep20"
@@ -535,6 +538,7 @@ components:
             - MATIC
             - XDC
             - ONE
+            - ALGO
         symbol:
           description: Symbol of the ERC20 token
           example: ERC_SYMBOL
@@ -1315,6 +1319,7 @@ components:
             - MATIC
             - XDC
             - ONE
+            - ALGO
         amount:
           description: Amount of tokens to be destroyed.
           example: "100000"
@@ -1349,7 +1354,7 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, XDC
+            - ETH, BSC, XDC, ALGO
         amount:
           description: Amount of tokens to be destroyed.
           example: "100000"
@@ -1464,6 +1469,92 @@ components:
         - feeCurrency
         - signatureId
         - amount
+    ChainTransferAlgoErc20:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: ALGO
+          description: Chain to work with.
+          enum:
+            - ALGO
+        to:
+          maxLength: 58
+          minLength: 42
+          description: Blockchain address to send ERC20 token to
+          example: "NTAESFCB3WOD7SAOL42KSPVARLB3JFA3MNX3AESWHYVT2RMYDVZI6YLG4Y"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 43
+          minLength: 1
+          description: assetIndex - asset index uniquely specifying the asset
+          example: "1"
+          type: string
+        fromPrivateKey:
+          type: string
+          maxLength: 103
+          example: "72TCV5BRQPBMSAFPYO3CPWVDBYWNGAYNMTW5QHENOMQF7I6QLNMJWCJZ7A3V5YKD7QD6ZZPEHG2PV2ZVVEDDO6BCRGXWIL3DIUMSUCI"
+          minLength: 103
+          description: Private key of sender address. Private key, or signature Id must be present.
+      required:
+        - chain
+        - currency
+        - to
+        - contractAddress
+        - fromPrivateKey
+        - amount
+    ChainTransferAlgoErc20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: ALGO
+          description: Chain to work with.
+          enum:
+            - ALGO
+        to:
+          maxLength: 58
+          minLength: 42
+          description: Blockchain address to send ERC20 token to
+          example: "TMETT6BXL3QUH7AH5TS6IONU7LVTLKIGG54CFCNPMQXWGRIZFIESZBYWP4"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 43
+          minLength: 1
+          description: assetIndex - asset index uniquely specifying the asset
+          example: "1"
+          type: string
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        from:
+          maxLength: 58
+          minLength: 42
+          description: Blockchain address to send ERC20 token to
+          example: "NTAESFCB3WOD7SAOL42KSPVARLB3JFA3MNX3AESWHYVT2RMYDVZI6YLG4Y"
+          type: string
+      required:
+        - chain
+        - currency
+        - to
+        - contractAddress
+        - signatureId
+        - amount
+        - from
     ChainTransferEthErc20:
       type: object
       properties:

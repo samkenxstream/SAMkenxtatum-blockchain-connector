@@ -89,7 +89,8 @@ export abstract class AdaService {
   }
 
 
-  public async getBlock(hash: string): Promise<Block> {
+  public async getBlock(hash: string, isTestnet?: boolean): Promise<Block> {
+    const testnet = isTestnet === undefined ? await this.isTestnet() : isTestnet
     let where
     if(/^\d+$/.test(hash)) {
       const blockNumber = new BigNumber(hash)
@@ -114,12 +115,13 @@ export abstract class AdaService {
           previousBlock { hash, number  }
           vrfKey
         } }`,
-    })
+    }, testnet)
     const [block] = response.data.data.blocks
     return block;
   }
 
-  public async getTransaction(hash: string): Promise<Transaction> {
+  public async getTransaction(hash: string, isTestnet?: boolean): Promise<Transaction> {
+    const testnet = isTestnet === undefined ? await this.isTestnet() : isTestnet
     const response = await this.sendNodeRequest({
       query: `{ transactions (where: { hash: { _eq: "${hash}" } }) {
           block { hash number }
@@ -138,7 +140,7 @@ export abstract class AdaService {
           withdrawals { address amount transaction { hash }}
           withdrawals_aggregate { aggregate { count } }
         } }`,
-    })
+    }, testnet)
     const [transaction] = response.data.data.transactions;
     return transaction;
   }
@@ -265,11 +267,7 @@ export abstract class AdaService {
     try {
       const response = await this.sendNodeRequest({query: `{transactions(where:{block:{number:{_gte:${blockNumber}}}})${TX_FIELDS}}`}, isTestnet)
       const { data } = response.data;
-      return (data?.transactions || []).map((t: any) => {
-        t.block = t.block.number;
-        delete t.block.number;
-        return t;
-      });
+      return (data?.transactions || []);
     } catch (e) {
       this.logger.error(e.response);
       throw new AdaError('Unable to find transaction.', 'tx.not.found');

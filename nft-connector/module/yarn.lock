@@ -1519,6 +1519,11 @@
     varuint-bitcoin "^1.0.4"
     wif "^2.0.1"
 
+"@tatumio/blockchain-connector-common@^1.1.6":
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/@tatumio/blockchain-connector-common/-/blockchain-connector-common-1.1.6.tgz#68f754ab917c06eeab556dbcc0dff70b4c126164"
+  integrity sha512-dMoY2jD9i0pQUnUc4PYo9C2GEBhwOrQysE9963JPO82e0rXGSnVPWvU9unFQigQRxpf1oynhMvAHliCG+kFSZw==
+
 "@tatumio/pushdata-bitcoin@1.2.2":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@tatumio/pushdata-bitcoin/-/pushdata-bitcoin-1.2.2.tgz#547f6a5750dd2ea689589c7fc2255c68ee20aec1"
@@ -1526,10 +1531,10 @@
   dependencies:
     "@tatumio/bitcoincash-ops" "2.0.0"
 
-"@tatumio/tatum@^1.28.14":
-  version "1.29.3"
-  resolved "https://registry.yarnpkg.com/@tatumio/tatum/-/tatum-1.29.3.tgz#7b722126e509de62f37f5abb6ece91f5b20eecac"
-  integrity sha512-DPaRAFObJ1LTQMJ/t2Dbe9wN0QkAxad50ZGKfxZAdnhorApRoN+iA869exqWAd2mcMzbef5Bsh/DE7Y7Jo1itw==
+"@tatumio/tatum@^1.29.14":
+  version "1.29.14"
+  resolved "https://registry.yarnpkg.com/@tatumio/tatum/-/tatum-1.29.14.tgz#004e2919c7d59dc960c7c7b9b4041de2068deefe"
+  integrity sha512-XmvTbdCfxCfkM7Wg99vK28E1qhcypJsMGLIdnn+DvaD/HZe7BPQ+2KpYpwHw6r97KgH+IvgSMtov7Th7tcYNuA==
   dependencies:
     "@binance-chain/javascript-sdk" "^4.1.1"
     "@celo-tools/celo-ethers-wrapper" "0.0.5"
