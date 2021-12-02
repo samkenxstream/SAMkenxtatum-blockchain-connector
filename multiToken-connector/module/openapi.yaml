@@ -18,6 +18,7 @@ tags:
       <ul>
       <li><b>Ethereum</b></li>
       <li><b>Polygon (Matic)</b></li>
+      <li><b>Kcc (KCS)</b></li>
       <li><b>Celo</b></li>
       <li><b>Harmony.ONE</b></li>
       <li><b>Binance Smart Chain</b></li>
@@ -35,6 +36,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
+        <li><b>Kcc (KCS)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -619,6 +621,7 @@ paths:
             enum:
               - ETH
               - MATIC
+              - KCS
               - CELO
             example: ETH
         - description: "Account address"
@@ -713,6 +716,7 @@ paths:
             enum:
               - ETH
               - MATIC
+              - KCS
               - ONE
               - CELO
               - BSC
@@ -779,6 +783,7 @@ paths:
             enum:
               - ETH
               - MATIC
+              - KCS
               - ONE
               - CELO
               - BSC
@@ -910,9 +915,7 @@ paths:
 #        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/balance/{chain}/{contractAddress}/{address}/{tokenId}:
     get:
-#      deprecated: true
       description: |
-#        <h4>1 credit per API call.</h4><br/><p>Get Multi Tokens on Account. Returns tokenIDs of tokens Account holds. This method is deprecated, use <a href="#operation/MultiTokenGetAddressBalance">Get contract address</a> instead.</p>
         <h4>1 credit per API call.</h4><br/><p>Get Multi Tokens on Account. Returns tokenIDs of tokens Account holds.</p>
       operationId: MultiTokenGetBalance
       parameters:
@@ -925,6 +928,7 @@ paths:
             enum:
               - ETH
               - MATIC
+              - KCS
               - ONE
               - CELO
               - BSC
@@ -1006,6 +1010,7 @@ paths:
             enum:
               - ETH
               - MATIC
+              - KCS
               - ONE
               - CELO
               - BSC
@@ -1084,6 +1089,7 @@ paths:
             enum:
               - ETH
               - MATIC
+              - KCS
               - ONE
               - CELO
               - BSC
@@ -1658,6 +1664,7 @@ components:
           enum:
             - ETH
             - MATIC
+            - KCS
             - CELO
             - ONE
             - BSC
@@ -1728,6 +1735,7 @@ components:
           enum:
             - ETH
             - MATIC
+            - KCS
             - CELO
             - ONE
             - BSC
@@ -2183,6 +2191,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
             - ALGO
         to:
@@ -2255,6 +2264,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         to:
           maxLength: 42
@@ -2331,6 +2341,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         uri:
           description: URI of the Multi Token token
@@ -2378,6 +2389,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         uri:
           description: URI of the Multi Token token
@@ -2426,6 +2438,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         to:
           maxLength: 42
@@ -2503,6 +2516,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         to:
           maxLength: 42
@@ -2585,6 +2599,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
             - ALGO
         tokenId:
@@ -2664,6 +2679,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         tokenId:
           description: ID of token to be created.
@@ -2742,6 +2758,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         to:
           type: array
@@ -2825,6 +2842,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         to:
           type: array
@@ -2913,6 +2931,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
             - ALGO
         account:
@@ -2986,6 +3005,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         account:
           maxLength: 42
@@ -3062,6 +3082,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         account:
           maxLength: 42
@@ -3139,6 +3160,7 @@ components:
             - ETH
             - ONE
             - MATIC
+            - KCS
             - BSC
         account:
           maxLength: 42
