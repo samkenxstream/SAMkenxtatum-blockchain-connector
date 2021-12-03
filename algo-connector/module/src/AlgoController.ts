@@ -1,6 +1,6 @@
 import { Get, Post, HttpCode, HttpStatus, Query, Param, Body, BadRequestException } from '@nestjs/common';
 import { AlgoService } from './AlgoService';
-import { QueryMnemonic, PathAddress } from '@tatumio/blockchain-connector-common';
+import { QueryMnemonic, PathAddress, AlgoNodeType } from '@tatumio/blockchain-connector-common';
 import { AlgoError } from './AlgoError';
 import { GeneratePrivateKey } from './dto/GeneratePrivateKey';
 import { PathRountNumber } from './dto/PathRoundNumber';
@@ -8,7 +8,6 @@ import { PathTransactionId } from './dto/PathTransactionId';
 import { AlgoTransaction, BroadcastTx } from '@tatumio/tatum';
 import { PathFromTo } from './PathFromTo';
 import { Pagination } from './Pagination';
-import { AlgoNodeType } from '@tatumio/blockchain-connector-common';
 export abstract class AlgoController {
   protected constructor(protected readonly service: AlgoService) { }
 
