@@ -28,7 +28,7 @@ export abstract class AlgoController {
     }
   }
 
-  @Post('/node/indexer/:key')
+  @Post('/node/indexer/:key/*')
   @HttpCode(HttpStatus.OK)
   public async nodePostIndexer(@Req() req: Request, @Param() param: { key: string }) {
     try {
@@ -44,7 +44,7 @@ export abstract class AlgoController {
     }
   }
 
-  @Get('/node/algod/:key')
+  @Get('/node/algod/:key/*')
   @HttpCode(HttpStatus.OK)
   public async nodeGetAlgod(@Req() req: Request, @Param() param: { key: string }) {
     try {
@@ -60,7 +60,7 @@ export abstract class AlgoController {
     }
   }
 
-  @Post('/node/algod/:key')
+  @Post('/node/algod/:key/*')
   @HttpCode(HttpStatus.OK)
   public async nodePostAlgod(@Req() req: Request, @Param() param: { key: string }) {
     try {
