@@ -1,4 +1,4 @@
-import { Get, Post, HttpCode, HttpStatus, Query, Param, Body, BadRequestException } from '@nestjs/common';
+import { Get, Post, HttpCode, HttpStatus, Req, Query, Param, Body, BadRequestException } from '@nestjs/common';
 import { AlgoService } from './AlgoService';
 import { QueryMnemonic, PathAddress, AlgoNodeType } from '@tatumio/blockchain-connector-common';
 import { AlgoError } from './AlgoError';
@@ -8,14 +8,15 @@ import { PathTransactionId } from './dto/PathTransactionId';
 import { AlgoTransaction, BroadcastTx } from '@tatumio/tatum';
 import { PathFromTo } from './PathFromTo';
 import { Pagination } from './Pagination';
+import {Request} from 'express';
 export abstract class AlgoController {
   protected constructor(protected readonly service: AlgoService) { }
 
-  @Get('/node/indexer/:xApiKey')
+  @Get('/node/indexer/:key/*')
   @HttpCode(HttpStatus.OK)
-  public async nodeGetIndexer(@Query() query: any) {
+  public async nodeGetIndexer(@Req() req: Request, @Param() param: { key: string }) {
     try {
-      return await this.service.nodeGetMethod(query, AlgoNodeType.INDEXER);
+      return await this.service.nodeMethod(req, param.key, AlgoNodeType.INDEXER);
     } catch (e) {
       if (['Array', 'ValidationError'].includes(e.constructor.name)) {
         throw new BadRequestException(e);
@@ -27,11 +28,11 @@ export abstract class AlgoController {
     }
   }
 
-  @Post('/node/indexer/:xApiKey')
+  @Post('/node/indexer/:key')
   @HttpCode(HttpStatus.OK)
-  public async nodePostIndexer(@Body() body: any) {
+  public async nodePostIndexer(@Req() req: Request, @Param() param: { key: string }) {
     try {
-      return await this.service.nodePostMethod(body, AlgoNodeType.INDEXER);
+      return await this.service.nodeMethod(req, param.key, AlgoNodeType.INDEXER);
     } catch (e) {
       if (['Array', 'ValidationError'].includes(e.constructor.name)) {
         throw new BadRequestException(e);
@@ -43,11 +44,11 @@ export abstract class AlgoController {
     }
   }
 
-  @Get('/node/algod/:xApiKey')
+  @Get('/node/algod/:key')
   @HttpCode(HttpStatus.OK)
-  public async nodeGetAlgod(@Query() query: any) {
+  public async nodeGetAlgod(@Req() req: Request, @Param() param: { key: string }) {
     try {
-      return await this.service.nodeGetMethod(query, AlgoNodeType.ALGOD);
+      return await this.service.nodeMethod(req, param.key, AlgoNodeType.ALGOD);
     } catch (e) {
       if (['Array', 'ValidationError'].includes(e.constructor.name)) {
         throw new BadRequestException(e);
@@ -59,11 +60,11 @@ export abstract class AlgoController {
     }
   }
 
-  @Post('/node/algod/:xApiKey')
+  @Post('/node/algod/:key')
   @HttpCode(HttpStatus.OK)
-  public async nodePostAlgod(@Body() body: any) {
+  public async nodePostAlgod(@Req() req: Request, @Param() param: { key: string }) {
     try {
-      return await this.service.nodePostMethod(body, AlgoNodeType.ALGOD);
+      return await this.service.nodeMethod(req, param.key, AlgoNodeType.ALGOD);
     } catch (e) {
       if (['Array', 'ValidationError'].includes(e.constructor.name)) {
         throw new BadRequestException(e);

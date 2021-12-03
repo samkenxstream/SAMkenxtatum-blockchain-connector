@@ -1,5 +1,5 @@
 import { PinoLogger } from 'nestjs-pino';
-const axios = require('axios');
+import axios, {AxiosRequestConfig} from 'axios';
 import {
   Currency,
   generateAlgoWallet,
@@ -12,7 +12,7 @@ import {
 
 import { BroadcastOrStoreKMSTransaction, AlgoNodeType } from '@tatumio/blockchain-connector-common';
 import { AlgoError } from './AlgoError';
-
+import { Request } from 'express';
 export abstract class AlgoService {
 
   private static mapBlock(block: any) {
@@ -192,22 +192,26 @@ export abstract class AlgoService {
     }
   }
 
-  public async nodePostMethod(body: any, algoNodeType: AlgoNodeType) {
+  public async nodeMethod(req: Request, key: string, algoNodeType: AlgoNodeType) {
     try {
-      return (await axios.post((await this.getNodesUrl(algoNodeType))[0], body, { headers: { 'Content-Type': 'application/json' } })).data;
+      const path = req.url;
+      const baseURL = (await this.getNodesUrl(algoNodeType))[0];
+      const [_, url] = path.split(`/${key}/`);
+      const config = {
+        method: req.method || 'GET',
+        url,
+        baseURL,
+        headers: {
+          'content-type': 'application/json',
+          'X-API-Key': key,
+        },
+        ...(Object.keys(req.body).length ? { data: req.body } : {}),
+      };
+
+        return (await axios.request(config as AxiosRequestConfig)).data;
     } catch (e) {
       this.logger.error(e);
       throw e;
     }
   }
-
-  public async nodeGetMethod(query: any, algoNodeType: AlgoNodeType) {
-    try {
-      return (await axios.get((await this.getNodesUrl(algoNodeType))[0] + query, { headers: { 'Content-Type': 'application/json' } })).data;
-    } catch (e) {
-      this.logger.error(e);
-      throw e;
-    }
-  }
-
 }
