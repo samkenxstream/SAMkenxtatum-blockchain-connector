@@ -131,11 +131,13 @@ paths:
       summary: Access Algorand Indexer GET node endpoints
       tags:
         - Blockchain / Algorand (ALGO)
-    post:
+  /v3/algorand/node/indexer/{xApiKey}/v2/transactions/{txid}:
+    get:
       description: |
         <h4>2 credits per API call.</h4><br/>
         <p>Use this endpoint URL as a http-based url to connect directly to the Algorand node provided by Tatum</p>
-      operationId: AlgoNodeIndexerPostDriver
+        <p>Lookup a single transaction</p>
+      operationId: AlgoNodeIndexerGetDriver
       parameters:
         - description: "Tatum X-API-Key used for authorization."
           in: path
@@ -144,20 +146,19 @@ paths:
           schema:
             type: string
             example: asdlkfjnqunalkwjfnq2oi303294857k
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              description: Any vaild http method content body.
-        required: true
+        - description: "Transaction Id"
+          in: path
+          name: txid
+          required: true
+          schema:
+            type: string
+            example: "LXEBXIBDAIF72NRI76SU252QSOGFCKEHTG7AI4P6W25V35PETU3Q"
       responses:
         200:
           content:
             application/json:
               schema:
-                type: object
-                description: Any valid http method response.
+                $ref: "#/components/schemas/AlgoTx"
           description: OK
         400:
           <<: *API400
@@ -168,7 +169,7 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Access Algorand Indexer POST node endpoints
+      summary: Access Algorand Indexer GET node endpoints | Lookup a single transaction
       tags:
         - Blockchain / Algorand (ALGO)
   /v3/algorand/node/algod/{xApiKey}:
@@ -243,6 +244,89 @@ paths:
         - X-Api-Key: [ ]
       x-code-samples:
       summary: Access Algorand Algod POST node endpoints
+      tags:
+        - Blockchain / Algorand (ALGO)
+  /v3/algorand/node/algod/{xApiKey}/v2/blocks/{round}:
+    get:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Use this endpoint URL as a http-based url to connect directly to the Algorand node provided by Tatum</p>
+        <p>This is algod node endpoint example. </p>
+      operationId: AlgoNodeGetDriver
+      parameters:
+        - description: "Tatum X-API-Key used for authorization."
+          in: path
+          name: xApiKey
+          required: true
+          schema:
+            type: string
+            example: asdlkfjnqunalkwjfnq2oi303294857k
+        - description: "Block round number"
+          in: path
+          name: round
+          required: true
+          schema:
+            type: string
+            example: 16775567
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlgoTxsWithPagination"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get Algorand block by block round number
+      tags:
+        - Blockchain / Algorand (ALGO)
+  /v3/algorand/node/algod/{xApiKey}/v2/transactions:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Use this endpoint URL as a http-based url to connect directly to the Algorand node provided by Tatum</p>
+      operationId: AlgoNodePostDriver
+      parameters:
+        - description: "Tatum X-API-Key used for authorization."
+          in: path
+          name: xApiKey
+          required: true
+          schema:
+            type: string
+            example: asdlkfjnqunalkwjfnq2oi303294857k
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {rawtxn : "REPLACE RAW TRANSACTION BINARY STRING"}
+              description: Any vaild http method content body.
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: string
+                description: txId - encoding of the transaction hash
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Access Algorand Algod POST node endpoints for transaction
       tags:
         - Blockchain / Algorand (ALGO)
   /v3/algorand/account/balance/{address}:
