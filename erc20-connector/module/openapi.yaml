@@ -658,7 +658,9 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, XDC
+            - ETH
+            - BSC
+            - XDC
         symbol:
           description: Symbol of the ERC20 token
           example: ERC_SYMBOL
@@ -1188,7 +1190,9 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, XDC
+            - ETH
+            - BSC
+            - XDC
         amount:
           description: Amount to be minted and transfered to the recipient.
           example: "100000"
@@ -1607,7 +1611,10 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, XDC, ALGO
+            - ETH
+            - BSC
+            - XDC
+            - ALGO
         amount:
           description: Amount of tokens to be destroyed.
           example: "100000"
@@ -1887,7 +1894,11 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, MATIC, XDC, ONE
+            - ETH
+            - BSC
+            - MATIC
+            - XDC
+            - ONE
         to:
           maxLength: 50
           minLength: 1
@@ -1954,7 +1965,11 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, MATIC, XDC, ONE
+            - ETH
+            - BSC
+            - MATIC
+            - XDC
+            - ONE
         to:
           maxLength: 50
           minLength: 1
