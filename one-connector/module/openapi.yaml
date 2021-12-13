@@ -270,7 +270,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 6470657
+            example: '6470657'
         - description: "Shard to read data from"
           in: query
           name: shardID
