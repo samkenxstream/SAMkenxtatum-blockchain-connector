@@ -2484,8 +2484,9 @@ components:
           description: ABI of the method to invoke.
         params:
           type: array
+          example: [ '0x632' ]
           items:
-            type: object
+            type: string
           description: Parameters of the method to be invoked.
         fromPrivateKey:
           type: string
@@ -2547,8 +2548,9 @@ components:
           description: ABI of the method to invoke.
         params:
           type: array
+          example: [ '0x632' ]
           items:
-            type: object
+            type: string
           description: Parameters of the method to be invoked.
         fromPrivateKey:
           type: string
