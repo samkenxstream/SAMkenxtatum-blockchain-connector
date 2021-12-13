@@ -79,6 +79,7 @@ paths:
           in: path
           name: index
           required: true
+          example: 1
           schema:
             type: number
             example: 0

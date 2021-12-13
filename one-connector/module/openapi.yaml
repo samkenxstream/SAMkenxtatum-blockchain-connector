@@ -78,6 +78,7 @@ paths:
         - description: "Derivation index of desired address to be generated."
           in: path
           name: index
+          example: 1
           required: true
           schema:
             type: number
