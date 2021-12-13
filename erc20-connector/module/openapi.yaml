@@ -47,7 +47,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 20
       requestBody:
         content:
           application/json:
@@ -126,7 +125,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 20
       operationId: Erc20Mint
       requestBody:
         content:
@@ -191,7 +189,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 20
       operationId: Erc20Burn
       requestBody:
         content:
@@ -256,7 +253,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 20
       operationId: Erc20Approve
       requestBody:
         content:
@@ -322,7 +318,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 20
       operationId: Erc20Transfer
       requestBody:
         content:
@@ -494,7 +489,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 20
       responses:
         200:
           content:

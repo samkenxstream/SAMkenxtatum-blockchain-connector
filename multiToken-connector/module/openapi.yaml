@@ -60,7 +60,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -147,7 +146,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -218,7 +216,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -290,7 +287,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -361,7 +357,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -434,7 +429,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -506,7 +500,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -577,7 +570,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -741,7 +733,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -808,7 +799,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -871,7 +861,6 @@ paths:
 #            enum:
 #              - ethereum-ropsten
 #              - ethereum-rinkeby
-#            maxLength: 10
 #      responses:
 #        200:
 #          content:
@@ -967,7 +956,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -1049,7 +1037,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -1122,7 +1109,6 @@ paths:
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
