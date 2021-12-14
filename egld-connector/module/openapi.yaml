@@ -95,8 +95,9 @@ paths:
           in: path
           name: index
           required: true
+          example: 1
           schema:
-            type: string
+            type: number
             example: 0
       responses:
         200:
@@ -175,7 +176,7 @@ paths:
             schema:
               type: object
               description: Any valid method content body.
-              example: {"version": 1,"chainId": "D","nonce": 42,"value": "100000000000000000","receiver": "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender": "erd1njqj2zggfup4nl83x0nfgqjkjserm7mjyxdx5vzkm8k0gkh40ezqtfz9lg","gasPrice": 1000000000,"gasLimit": 70000,"data": "food for cats","signature": "93207c579bf57be03add632b0e1624a73576eeda8a1687e0fa286f03eb1a17ffb125ccdb008a264c402f074a360442c7a034e237679322f62268b614e926d10f"}
+              example: { "version": 1,"chainId": "D","nonce": 42,"value": "100000000000000000","receiver": "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender": "erd1njqj2zggfup4nl83x0nfgqjkjserm7mjyxdx5vzkm8k0gkh40ezqtfz9lg","gasPrice": 1000000000,"gasLimit": 70000,"data": "food for cats","signature": "93207c579bf57be03add632b0e1624a73576eeda8a1687e0fa286f03eb1a17ffb125ccdb008a264c402f074a360442c7a034e237679322f62268b614e926d10f" }
         required: true
       responses:
         200:
@@ -217,7 +218,7 @@ paths:
               schema:
                 type: object
                 description: Any valid response.
-                example: {"config":{"erd_chain_id":"1","erd_denomination":18,"erd_gas_per_data_byte":1500,"erd_latest_tag_software_version":"v1.1.0.0","erd_meta_consensus_group_size":400,"erd_min_gas_limit":50000,"erd_min_gas_price":1000000000,"erd_min_transaction_version":1,"erd_num_metachain_nodes":400,"erd_num_nodes_in_shard":400,"erd_num_shards_without_meta":3,"erd_round_duration":6000,"erd_shard_consensus_group_size":63,"erd_start_time":1596117600}}
+                example: { "config": { "erd_chain_id": "1","erd_denomination": 18,"erd_gas_per_data_byte": 1500,"erd_latest_tag_software_version": "v1.1.0.0","erd_meta_consensus_group_size": 400,"erd_min_gas_limit": 50000,"erd_min_gas_price": 1000000000,"erd_min_transaction_version": 1,"erd_num_metachain_nodes": 400,"erd_num_nodes_in_shard": 400,"erd_num_shards_without_meta": 3,"erd_round_duration": 6000,"erd_shard_consensus_group_size": 63,"erd_start_time": 1596117600 } }
           description: OK
         400:
           <<: *API400
@@ -450,7 +451,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on devnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: EgldBlockchainTransfer
       requestBody:
@@ -492,296 +493,295 @@ paths:
       summary: Send EGLD from account to account
       tags:
         - Blockchain / Elrond Network (EGLD)
-  # /v3/egld/gas:
-  #   post:
-  #     description: |
-  #       <h4>2 credits per API call.</h4><br/>
-  #       <p>Estimate gasLimit and gasPrice of the EGLD transaction. Gas limit is obtained from <a href="https://gateway.elrond.com/transaction/cost" target="_blank">https://gateway.elrond.com/transaction/cost</a>.
-  #       Gas price is obtained from <a href="https://gateway.elrond.com/network/config" target="_blank">https://gateway.elrond.com/network/config</a>.
-  #       </p>
-  #     operationId: EgldEstimateGas
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: "#/components/schemas/TransactionFeeEgldBlockchain"
-  #       required: true
-  #     responses:
-  #       200:
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               required:
-  #                 - gasLimit
-  #                 - gasPrice
-  #               properties:
-  #                 gasLimit:
-  #                   type: string
-  #                   description: Gas limit for transaction in gas price.
-  #                   example: "77000"
-  #                 gasPrice:
-  #                   type: string
-  #                   description: Gas price.
-  #                   example: "1000000000"
-  #         description: OK
-  #       400:
-  #         <<: *API400
-  #       401:
-  #         <<: *API401
-  #       403:
-  #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               oneOf:
-  #                 - $ref: "#/components/schemas/Error403EgldGasCalculation"
-  #       500:
-  #         <<: *API500
-  #     security:
-  #       - X-Api-Key: [ ]
-  #     x-code-samples:
-  #     summary: Estimate EGLD transaction fees
-  #     tags:
-  #       - Blockchain / Elrond Network (EGLD)
-  # /v3/egld/esdt/{method}:
-  #   post:
-  #     description: |
-  #       <h4>2 credits per API call.</h4><br/>
-  #       <p>Working with a Elrond Standard Digital Token.
-  #       For read operations, data is returned, for write operations, transaction Id of the associated transaction is returned.<br/><br/>
+    # /v3/egld/gas:
+    #   post:
+    #     description: |
+    #       <h4>2 credits per API call.</h4><br/>
+    #       <p>Estimate gasLimit and gasPrice of the EGLD transaction. Gas limit is obtained from <a href="https://gateway.elrond.com/transaction/cost" target="_blank">https://gateway.elrond.com/transaction/cost</a>.
+    #       Gas price is obtained from <a href="https://gateway.elrond.com/network/config" target="_blank">https://gateway.elrond.com/network/config</a>.
+    #       </p>
+    #     operationId: EgldEstimateGas
+    #     requestBody:
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/TransactionFeeEgldBlockchain"
+    #       required: true
+    #     responses:
+    #       200:
+    #         content:
+    #           application/json:
+    #             schema:
+    #               type: object
+    #               required:
+    #                 - gasLimit
+    #                 - gasPrice
+    #               properties:
+    #                 gasLimit:
+    #                   type: string
+    #                   description: Gas limit for transaction in gas price.
+    #                   example: "77000"
+    #                 gasPrice:
+    #                   type: string
+    #                   description: Gas price.
+    #                   example: "1000000000"
+    #         description: OK
+    #       400:
+    #         <<: *API400
+    #       401:
+    #         <<: *API401
+    #       403:
+    #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+    #         content:
+    #           application/json:
+    #             schema:
+    #               oneOf:
+    #                 - $ref: "#/components/schemas/Error403EgldGasCalculation"
+    #       500:
+    #         <<: *API500
+    #     security:
+    #       - X-Api-Key: [ ]
+    #     x-code-samples:
+    #     summary: Estimate EGLD transaction fees
+    #     tags:
+    #       - Blockchain / Elrond Network (EGLD)
+    # /v3/egld/esdt/{method}:
+    #   post:
+    #     description: |
+    #       <h4>2 credits per API call.</h4><br/>
+    #       <p>Working with a Elrond Standard Digital Token.
+    #       For read operations, data is returned, for write operations, transaction Id of the associated transaction is returned.<br/><br/>
 
-  #       Detail information please find here <a href="https://docs.elrond.com/developers/esdt-tokens/" target="_blank"> Elrond DOCS </a>.<br/><br/>
+    #       Detail information please find here <a href="https://docs.elrond.com/developers/esdt-tokens/" target="_blank"> Elrond DOCS </a>.<br/><br/>
 
-  #       This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
-  #       No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
-  #       or signatureId. PrivateKey should be used only for quick development on devnet versions of blockchain when there is no risk of losing funds. In production,
-  #       <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-  #       Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.</p>
-  #     operationId: EgldBlockchainEsdt
-  #     parameters:
-  #       - description: method
-  #         in: path
-  #         name: method
-  #         required: true
-  #         schema:
-  #           type: string
-  #           example: mint
-  #           enum:
-  #             - deploy
-  #             - mint
-  #             - burn
-  #             - pause
-  #             - role
-  #             - freeze
-  #             - wipe
-  #             - owner
-  #             - control
-  #             - transfer
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             oneOf:
-  #               - $ref: "#/components/schemas/CallEgldSCDeployMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCDeployMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCMintMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCMintMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCBurnMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCBurnMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCPauseMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCPauseMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCRoleMethod"
-  #               - $ref: "#/components/schemas/CallEgldSRoleMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCFreezeMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCFreezeMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCWipeMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCWipeMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCOwnerMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCOwnerMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCControlMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCControlMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCTransferMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCTransferMethodKMS"
-  #       required: true
-  #     responses:
-  #       200:
-  #         content:
-  #           application/json:
-  #             schema:
-  #               oneOf:
-  #                 - $ref: "#/components/schemas/TransactionHashKMS"
-  #                 - $ref: "#/components/schemas/SignatureId"
-  #                 - $ref: "#/components/schemas/Data"
-  #         description: OK
-  #       400:
-  #         <<: *API400
-  #       401:
-  #         <<: *API401
-  #       403:
-  #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               oneOf:
-  #                 - $ref: "#/components/schemas/Error403EgldBroadcast"
-  #                 - $ref: "#/components/schemas/Error403EgldGasCalculation"
-  #                 - $ref: "#/components/schemas/Error403EgldTxHash"
-  #                 - $ref: "#/components/schemas/Error403EgldTxSign"
-  #       500:
-  #         <<: *API500
-  #     security:
-  #       - X-Api-Key: [ ]
-  #     x-code-samples:
-  #     summary: Working with a Smart Contract.
-  #     tags:
-  #       - Blockchain / Elrond Network (EGLD)
-  # /v3/egld/nft/{method}:
-  #   post:
-  #     description: |
-  #       <h4>2 credits per API call.</h4><br/>
-  #       <p>Working with a NFT/SFT.
-  #       For read operations, data is returned, for write operations, transaction Id of the associated transaction is returned.<br/><br/>
+    #       This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+    #       No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+    #       or signatureId. PrivateKey should be used only for quick development on devnet versions of blockchain when there is no risk of losing funds. In production,
+    #       <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+    #       Alternatively, using the Tatum client library for supported languages.</p>
+    #     operationId: EgldBlockchainEsdt
+    #     parameters:
+    #       - description: method
+    #         in: path
+    #         name: method
+    #         required: true
+    #         schema:
+    #           type: string
+    #           example: mint
+    #           enum:
+    #             - deploy
+    #             - mint
+    #             - burn
+    #             - pause
+    #             - role
+    #             - freeze
+    #             - wipe
+    #             - owner
+    #             - control
+    #             - transfer
+    #     requestBody:
+    #       content:
+    #         application/json:
+    #           schema:
+    #             oneOf:
+    #               - $ref: "#/components/schemas/CallEgldSCDeployMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCDeployMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCMintMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCMintMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCBurnMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCBurnMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCPauseMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCPauseMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCRoleMethod"
+    #               - $ref: "#/components/schemas/CallEgldSRoleMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCFreezeMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCFreezeMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCWipeMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCWipeMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCOwnerMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCOwnerMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCControlMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCControlMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCTransferMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCTransferMethodKMS"
+    #       required: true
+    #     responses:
+    #       200:
+    #         content:
+    #           application/json:
+    #             schema:
+    #               oneOf:
+    #                 - $ref: "#/components/schemas/TransactionHashKMS"
+    #                 - $ref: "#/components/schemas/SignatureId"
+    #                 - $ref: "#/components/schemas/Data"
+    #         description: OK
+    #       400:
+    #         <<: *API400
+    #       401:
+    #         <<: *API401
+    #       403:
+    #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+    #         content:
+    #           application/json:
+    #             schema:
+    #               oneOf:
+    #                 - $ref: "#/components/schemas/Error403EgldBroadcast"
+    #                 - $ref: "#/components/schemas/Error403EgldGasCalculation"
+    #                 - $ref: "#/components/schemas/Error403EgldTxHash"
+    #                 - $ref: "#/components/schemas/Error403EgldTxSign"
+    #       500:
+    #         <<: *API500
+    #     security:
+    #       - X-Api-Key: [ ]
+    #     x-code-samples:
+    #     summary: Working with a Smart Contract.
+    #     tags:
+    #       - Blockchain / Elrond Network (EGLD)
+    # /v3/egld/nft/{method}:
+    #   post:
+    #     description: |
+    #       <h4>2 credits per API call.</h4><br/>
+    #       <p>Working with a NFT/SFT.
+    #       For read operations, data is returned, for write operations, transaction Id of the associated transaction is returned.<br/><br/>
 
-  #       Detail information please find here <a href="https://docs.elrond.com/developers/nft-tokens/" target="_blank"> Elrond DOCS </a>.<br/><br/>
+    #       Detail information please find here <a href="https://docs.elrond.com/developers/nft-tokens/" target="_blank"> Elrond DOCS </a>.<br/><br/>
 
-  #       This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
-  #       No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
-  #       or signatureId. PrivateKey should be used only for quick development on devnet versions of blockchain when there is no risk of losing funds. In production,
-  #       <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-  #       Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.</p>
-  #     operationId: EgldBlockchainNft
-  #     parameters:
-  #       - description: method
-  #         in: path
-  #         name: method
-  #         required: true
-  #         schema:
-  #           type: string
-  #           example: freeze
-  #           enum:
-  #             - deploy
-  #             - create
-  #             - role-transfer
-  #             - stop-create
-  #             - add
-  #             - freeze
-  #             - wipe
-  #             - burn
-  #             - control
-  #             - transfer
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             oneOf:
-  #               - $ref: "#/components/schemas/CallEgldNFTDeployMethod"
-  #               - $ref: "#/components/schemas/CallEgldNFTDeployMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldNFTCreateMethod"
-  #               - $ref: "#/components/schemas/CallEgldNFTCreateMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldNFTRoleTransferethod"
-  #               - $ref: "#/components/schemas/CallEgldNFTRoleTransferethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldNFTStopCreateMethod"
-  #               - $ref: "#/components/schemas/CallEgldNFTStopCreateMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldNFTAddMethod"
-  #               - $ref: "#/components/schemas/CallEgldNFTAddMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldNFTFreezeMethod"
-  #               - $ref: "#/components/schemas/CallEgldNFTFreezeMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldNFTWipeMethod"
-  #               - $ref: "#/components/schemas/CallEgldNFTWipeMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldNFTBurnMethod"
-  #               - $ref: "#/components/schemas/CallEgldNFTBurnMethodKMS"
-  #               - $ref: "#/components/schemas/CallEgldSCControlMethod"
-  #               - $ref: "#/components/schemas/CallEgldSCControlMethodKMS"
-#   #               - $ref: "#/components/schemas/CallEgldNFTTransferMethod"
-#   #               - $ref: "#/components/schemas/CallEgldNFTTransferMethodKMS"
-#   #       required: true
-#   #     responses:
-#   #       200:
-#   #         content:
-#   #           application/json:
-#   #             schema:
-#   #               oneOf:
-#   #                 - $ref: "#/components/schemas/TransactionHashKMS"
-#   #                 - $ref: "#/components/schemas/SignatureId"
-#   #                 - $ref: "#/components/schemas/Data"
-#   #         description: OK
-#   #       400:
-#   #         <<: *API400
-#   #       401:
-#   #         <<: *API401
-#   #       403:
-#   #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-#   #         content:
-#   #           application/json:
-#   #             schema:
-#   #               oneOf:
-#   #                 - $ref: "#/components/schemas/Error403EgldBroadcast"
-#   #                 - $ref: "#/components/schemas/Error403EgldGasCalculation"
-#   #                 - $ref: "#/components/schemas/Error403EgldTxHash"
-#   #                 - $ref: "#/components/schemas/Error403EgldTxSign"
-#   #       500:
-#   #         <<: *API500
-#   #     security:
-#   #       - X-Api-Key: [ ]
-#   #     x-code-samples:
-#   #     summary: Working with a NFT/SFT
-#   #     tags:
-#   #       - Blockchain / Elrond Network (EGLD)
-#   /v3/egld/broadcast:
-#     post:
-#       description: |
-#         <h4>2 credits per API call.</h4><br/>
-#         <p>Broadcast signed transaction to EGLD blockchain. This method is used internally from Tatum KMS or Tatum client libraries.
-#         It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchian.</p>
-#       operationId: EgldBroadcast
-#       requestBody:
-#         content:
-#           application/json:
-#             schema:
-#               $ref: "#/components/schemas/BroadcastKMS"
-#         required: true
-#       responses:
-#         200:
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: "#/components/schemas/TransactionHashKMS"
-#           description: OK
-#         400:
-#           <<: *API400
-#         401:
-#           <<: *API401
-#         403:
-#           description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: "#/components/schemas/Error403EgldBroadcast"
-#         500:
-#           <<: *API500
-#       security:
-#         - X-Api-Key: [ ]
-#       x-code-samples:
-#       summary: Broadcast signed EGLD transaction
-#       tags:
-#         - Blockchain / Elrond Network (EGLD)
-
-# components:
-#   securitySchemes:
-#     X-Api-Key:
-#       description: |
-#         To maintain the highest security level, Tatum requires X-API-Key HTTP header.
-#         This X-API-Key represents identification of the plan and can be used by 1 developer or per environment.
-#         Each X-API-Key is bound to the test or production blockchains.
-#       in: header
-#       name: x-api-key
-#       type: apiKey
-#   schemas:
-#     EgldBlock:
-#       type: object
-#       properties:
-#         nonce:
+    #       This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+    #       No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+    #       or signatureId. PrivateKey should be used only for quick development on devnet versions of blockchain when there is no risk of losing funds. In production,
+    #       <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+    #       Alternatively, using the Tatum client library for supported languages.</p>
+    #     operationId: EgldBlockchainNft
+    #     parameters:
+    #       - description: method
+    #         in: path
+    #         name: method
+    #         required: true
+    #         schema:
+    #           type: string
+    #           example: freeze
+    #           enum:
+    #             - deploy
+    #             - create
+    #             - role-transfer
+    #             - stop-create
+    #             - add
+    #             - freeze
+    #             - wipe
+    #             - burn
+    #             - control
+    #             - transfer
+    #     requestBody:
+    #       content:
+    #         application/json:
+    #           schema:
+    #             oneOf:
+    #               - $ref: "#/components/schemas/CallEgldNFTDeployMethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTDeployMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldNFTCreateMethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTCreateMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldNFTRoleTransferethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTRoleTransferethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldNFTStopCreateMethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTStopCreateMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldNFTAddMethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTAddMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldNFTFreezeMethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTFreezeMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldNFTWipeMethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTWipeMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldNFTBurnMethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTBurnMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldSCControlMethod"
+    #               - $ref: "#/components/schemas/CallEgldSCControlMethodKMS"
+    #               - $ref: "#/components/schemas/CallEgldNFTTransferMethod"
+    #               - $ref: "#/components/schemas/CallEgldNFTTransferMethodKMS"
+    #       required: true
+    #     responses:
+    #       200:
+    #         content:
+    #           application/json:
+    #             schema:
+    #               oneOf:
+    #                 - $ref: "#/components/schemas/TransactionHashKMS"
+    #                 - $ref: "#/components/schemas/SignatureId"
+    #                 - $ref: "#/components/schemas/Data"
+    #         description: OK
+    #       400:
+    #         <<: *API400
+    #       401:
+    #         <<: *API401
+    #       403:
+    #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+    #         content:
+    #           application/json:
+    #             schema:
+    #               oneOf:
+    #                 - $ref: "#/components/schemas/Error403EgldBroadcast"
+    #                 - $ref: "#/components/schemas/Error403EgldGasCalculation"
+    #                 - $ref: "#/components/schemas/Error403EgldTxHash"
+    #                 - $ref: "#/components/schemas/Error403EgldTxSign"
+    #       500:
+    #         <<: *API500
+    #     security:
+    #       - X-Api-Key: [ ]
+    #     x-code-samples:
+    #     summary: Working with a NFT/SFT
+    #     tags:
+    #       - Blockchain / Elrond Network (EGLD)
+  /v3/egld/broadcast:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Broadcast signed transaction to EGLD blockchain. This method is used internally from Tatum KMS or Tatum client libraries.
+        It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchian.</p>
+      operationId: EgldBroadcast
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BroadcastKMS"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionHashKMS"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403EgldBroadcast"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Broadcast signed EGLD transaction
+      tags:
+        - Blockchain / Elrond Network (EGLD)
+components:
+  securitySchemes:
+    X-Api-Key:
+      description: |
+        To maintain the highest security level, Tatum requires X-API-Key HTTP header.
+        This X-API-Key represents identification of the plan and can be used by 1 developer or per environment.
+        Each X-API-Key is bound to the test or production blockchains.
+      in: header
+      name: x-api-key
+      type: apiKey
+  schemas:
+    EgldBlock:
+      type: object
+      properties:
+        nonce:
           description: The block height.
           type: number
           example: 5440076
@@ -883,7 +883,7 @@ paths:
           example: 2
         destinationShard:
           type: number
-          description:  Destination shard.
+          description: Destination shard.
           example: 1
         blockNonce:
           type: number

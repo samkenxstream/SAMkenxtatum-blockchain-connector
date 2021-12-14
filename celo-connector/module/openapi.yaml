@@ -90,6 +90,7 @@ paths:
         - description: "Derivation index of desired address to be generated."
           in: path
           name: index
+          example: 1
           required: true
           schema:
             type: number
@@ -226,7 +227,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 6470657
+            example: '6470657'
       responses:
         200:
           content:
@@ -272,6 +273,10 @@ paths:
                   cUsd:
                     type: string
                     description: Balance of cUSD
+                    example: "11.53"
+                  cEur:
+                    type: string
+                    description: Balance of cEUR
                     example: "11.53"
           description: OK
         400:
@@ -444,7 +449,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: CeloBlockchainTransfer
       requestBody:
@@ -493,7 +498,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.</p>
+        Alternatively, using the Tatum client library for supported languages.</p>
       operationId: CeloBlockchainSmartContractInvocation
       requestBody:
         content:
@@ -1684,7 +1689,7 @@ components:
           type: array
           example: [ '0x632' ]
           items:
-            type: object
+            type: string
           description: Parameters of the method to be invoked.
         amount:
           description: Amount of the assets to be sent.
@@ -1767,7 +1772,7 @@ components:
           type: array
           example: [ '0x632' ]
           items:
-            type: object
+            type: string
           description: Parameters of the method to be invoked.
       required:
         - contractAddress
@@ -1794,8 +1799,9 @@ components:
           description: ABI of the method to invoke.
         params:
           type: array
+          example: [ '0x632' ]
           items:
-            type: object
+            type: string
           description: Parameters of the method to be invoked.
         index:
           type: number

@@ -18,7 +18,7 @@ tags:
       <ul>
       <li><b>Ethereum</b></li>
       <li><b>Polygon (Matic)</b></li>
-      <li><b>Kcc (KCS)</b></li>
+      <li><b>Kcs (KCS)</b></li>
       <li><b>Celo</b></li>
       <li><b>Harmony.ONE</b></li>
       <li><b>Binance Smart Chain</b></li>
@@ -36,7 +36,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
-        <li><b>Kcc (KCS)</b></li>
+        <li><b>Kcs (KCS)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -46,7 +46,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: DeployMultiToken
       parameters:
@@ -55,12 +55,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -123,6 +122,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
+        <li><b>Kcs (KCS)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -132,7 +132,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: MintMultiToken
       parameters:
@@ -141,12 +141,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -190,10 +189,11 @@ paths:
       description: |
         <h4>2 credits per API call.</h4><br/>
         <p>Create a fixed amount of multiple Multi Tokens Tokens and transfer them to destination account in one transaction. Create and transfer Multi Tokens tokens from smart contract defined in contractAddress.<br/><br/>
-        Tatum now supports Multi Tokens these blockchains:<br/>
+        Tatum now supports Multi Tokens on these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
+        <li><b>Kcs (KCS)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -202,7 +202,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: MintMultiTokenBatch
       parameters:
@@ -211,12 +211,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -264,6 +263,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
+        <li><b>Kcs (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -273,7 +273,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: BurnMultiToken
       parameters:
@@ -282,12 +282,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -335,6 +334,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
+        <li><b>Kcs (KCS)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -343,7 +343,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: BurnMultiTokenBatch
       parameters:
@@ -352,12 +352,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -406,6 +405,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
+        <li><b>Kcs (KCS)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -415,7 +415,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: TransferMultiToken
       parameters:
@@ -424,12 +424,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -478,6 +477,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
+        <li><b>Kcs (KCS)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -486,7 +486,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: TransferMultiTokenBatch
       parameters:
@@ -495,12 +495,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -548,6 +547,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Polygon (Matic)</b></li>
+        <li><b>Kcs (KCS)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -556,7 +556,7 @@ paths:
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        Alternatively, using the Tatum client library for supported languages.
         </p>
       operationId: AddMultiTokenMinter
       parameters:
@@ -565,12 +565,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       requestBody:
         content:
           application/json:
@@ -619,11 +618,8 @@ paths:
           schema:
             type: string
             enum:
-              - ETH
-              - MATIC
-              - KCS
               - CELO
-            example: ETH
+            example: CELO
         - description: "Account address"
           in: path
           name: address
@@ -732,12 +728,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -799,12 +794,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -862,12 +856,11 @@ paths:
 #          name: x-testnet-type
 #          required: false
 #          schema:
-#            default: ropsten
+#            default: ethereum-ropsten
 #            type: string
 #            enum:
 #              - ethereum-ropsten
 #              - ethereum-rinkeby
-#            maxLength: 10
 #      responses:
 #        200:
 #          content:
@@ -958,12 +951,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -1040,12 +1032,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -1113,12 +1104,11 @@ paths:
           name: x-testnet-type
           required: false
           schema:
-            default: ropsten
+            default: ethereum-ropsten
             type: string
             enum:
               - ethereum-ropsten
               - ethereum-rinkeby
-            maxLength: 10
       responses:
         200:
           content:
@@ -1670,13 +1660,13 @@ components:
             - BSC
         contractAddress:
           maxLength: 42
-          minLength: 43
+          minLength: 42
           description: Address of MultiToken token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         minter:
           maxLength: 42
-          minLength: 43
+          minLength: 42
           description: Address of MultiToken minter
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string

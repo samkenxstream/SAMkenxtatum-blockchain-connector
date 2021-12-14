@@ -4,22 +4,22 @@ import {Erc20Error} from './Erc20Error';
 import {
     ChainBurnCeloErc20,
     ChainBurnErc20,
+    ChainBurnKcsErc20,
     ChainDeployCeloErc20,
     ChainDeployErc20,
+    ChainDeployKcsErc20,
+    ChainEgldEsdtTransaction,
     ChainMintCeloErc20,
     ChainMintErc20,
+    ChainMintKcsErc20,
+    ChainTransferAlgoErc20,
     ChainTransferBscBep20,
     ChainTransferCeloErc20Token,
     ChainTransferErc20,
     ChainTransferEthErc20,
     ChainTransferHrm20,
-    ChainTransferPolygonErc20,
-    ChainEgldEsdtTransaction,
-    ChainTransferAlgoErc20,
-    ChainBurnKccErc20,
-    ChainDeployKccErc20,
-    ChainMintKccErc20,
-    ChainTransferKccErc20
+    ChainTransferKcsErc20,
+    ChainTransferPolygonErc20
 } from './Erc20Base';
 import {HarmonyAddress} from '@harmony-js/crypto';
 import {
@@ -29,21 +29,33 @@ import {
     Currency,
     DeployCeloErc20,
     DeployErc20,
+    EgldEsdtTransaction,
+    egldGetAccountErc20Balance,
     fromXdcAddress,
+    getAlgoClient,
     MintCeloErc20,
     MintErc20,
     OneBurn20,
     OneMint20,
     OneTransfer20,
+    prepareAlgoBurnFTSignedTransaction,
+    prepareAlgoCreateFTSignedTransaction,
+    prepareAlgoTransferFTSignedTransaction,
     prepareAuctionApproveErc20Transfer,
-    prepareBscOrBep20SignedTransaction,
     prepareBurnBep20SignedTransaction,
     prepareCeloBurnErc20SignedTransaction,
     prepareCeloDeployErc20SignedTransaction,
     prepareCeloMintErc20SignedTransaction,
-    prepareCeloTransferErc20SignedTransaction, prepareCustomBep20SignedTransaction, prepareCustomErc20SignedTransaction,
+    prepareCeloTransferErc20SignedTransaction,
+    prepareCustomBep20SignedTransaction,
+    prepareCustomErc20SignedTransaction,
     prepareDeployBep20SignedTransaction,
     prepareDeployErc20SignedTransaction,
+    prepareEgldBurnEsdtSignedTransaction,
+    prepareEgldDeployEsdtSignedTransaction,
+    prepareEgldFreezeOrWipeOrOwvershipEsdtSignedTransaction,
+    prepareEgldMintEsdtSignedTransaction,
+    prepareEgldTransferEsdtSignedTransaction,
     prepareEthBurnErc20SignedTransaction,
     prepareEthMintErc20SignedTransaction,
     prepareEthOrErc20SignedTransaction,
@@ -57,38 +69,27 @@ import {
     preparePolygonMintErc20SignedTransaction,
     preparePolygonTransferErc20SignedTransaction,
     prepareXdcBurnErc20SignedTransaction,
+    prepareXdcCustomErc20SignedTransaction,
     prepareXdcDeployErc20SignedTransaction,
     prepareXdcMintErc20SignedTransaction,
-    prepareXdcOrErc20SignedTransaction,
     TransactionHash,
-    TransferBscBep20,
     TransferCeloOrCeloErc20Token,
-    TransferErc20,
-    EgldEsdtTransaction,
-    prepareEgldDeployEsdtSignedTransaction,
-    prepareEgldMintEsdtSignedTransaction,
-    prepareEgldBurnEsdtSignedTransaction,
-    prepareEgldTransferEsdtSignedTransaction,
-    prepareEgldFreezeOrWipeOrOwvershipEsdtSignedTransaction,
-    egldGetAccountErc20Balance,
-    prepareAlgoCreateFTSignedTransaction,
-    prepareAlgoTransferFTSignedTransaction,
-    prepareAlgoBurnFTSignedTransaction,
-    getAlgoClient
+    TransferErc20
 } from '@tatumio/tatum';
 import erc20_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 import {
-    TransferErc20 as CoreTransferErc20,
     BurnErc20 as CoreBurnErc20,
     DeployErc20 as CoreDeployErc20,
-    MintErc20 as CoreMintErc20
+    MintErc20 as CoreMintErc20,
+    TransferErc20 as CoreTransferErc20
 } from '@tatumio/tatum-core'
 import {
-    prepareKccTransferErc20SignedTransaction,
-    prepareKccBurnErc20SignedTransaction,
-    prepareKccMintErc20SignedTransaction,
-    prepareKccDeployErc20SignedTransaction
-} from '@tatumio/tatum-kcc'
+    prepareKcsBurnErc20SignedTransaction,
+    prepareKcsDeployErc20SignedTransaction,
+    prepareKcsMintErc20SignedTransaction,
+    prepareKcsTransferErc20SignedTransaction
+} from '@tatumio/tatum-kcs'
+
 export abstract class Erc20Service {
 
     protected constructor(protected readonly logger: PinoLogger) {
@@ -151,7 +152,7 @@ export abstract class Erc20Service {
     }
 
     public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token |
-        ChainTransferErc20 | ChainTransferHrm20 | ChainTransferPolygonErc20 | ChainEgldEsdtTransaction | ChainTransferAlgoErc20 | ChainTransferKccErc20):
+        ChainTransferErc20 | ChainTransferHrm20 | ChainTransferPolygonErc20 | ChainEgldEsdtTransaction | ChainTransferAlgoErc20 | ChainTransferKcsErc20):
         Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const {chain, ..._body} = body;
@@ -171,7 +172,7 @@ export abstract class Erc20Service {
                 txData = await preparePolygonTransferErc20SignedTransaction(testnet, _body as TransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.KCS:
-                txData = await prepareKccTransferErc20SignedTransaction(_body as CoreTransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareKcsTransferErc20SignedTransaction(_body as CoreTransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
                 txData = await prepareCustomBep20SignedTransaction(_body as TransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
@@ -183,7 +184,7 @@ export abstract class Erc20Service {
                 txData = await prepareEgldTransferEsdtSignedTransaction(_body as EgldEsdtTransaction, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.XDC:
-                txData = await prepareXdcOrErc20SignedTransaction(_body as TransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareXdcCustomErc20SignedTransaction(_body as TransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.ALGO:
                 txData = await prepareAlgoTransferFTSignedTransaction(testnet, _body as TransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
@@ -198,7 +199,7 @@ export abstract class Erc20Service {
         }
     }
 
-    public async burnErc20(body: ChainBurnErc20 | ChainBurnCeloErc20 | ChainEgldEsdtTransaction | ChainBurnKccErc20): Promise<TransactionHash | { signatureId: string }> {
+    public async burnErc20(body: ChainBurnErc20 | ChainBurnCeloErc20 | ChainEgldEsdtTransaction | ChainBurnKcsErc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const {chain, ..._body} = body;
         let txData;
@@ -213,7 +214,7 @@ export abstract class Erc20Service {
                 txData = await preparePolygonBurnErc20SignedTransaction(testnet, _body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.KCS:
-                txData = await prepareKccBurnErc20SignedTransaction(_body as CoreBurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareKcsBurnErc20SignedTransaction(_body as CoreBurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
                 txData = await prepareBurnBep20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
@@ -240,7 +241,7 @@ export abstract class Erc20Service {
         }
     }
 
-    public async mintErc20(body: ChainMintErc20 | ChainMintCeloErc20 | ChainEgldEsdtTransaction | ChainMintKccErc20): Promise<TransactionHash | { signatureId: string }> {
+    public async mintErc20(body: ChainMintErc20 | ChainMintCeloErc20 | ChainEgldEsdtTransaction | ChainMintKcsErc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const {chain, ..._body} = body;
         let txData;
@@ -255,7 +256,7 @@ export abstract class Erc20Service {
                 txData = await preparePolygonMintErc20SignedTransaction(testnet, _body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.KCS:
-                txData = await prepareKccMintErc20SignedTransaction(_body as CoreMintErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareKcsMintErc20SignedTransaction(_body as CoreMintErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
                 txData = await prepareMintBep20SignedTransaction(_body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
@@ -279,7 +280,7 @@ export abstract class Erc20Service {
         }
     }
 
-    public async deployErc20(body: ChainDeployErc20 | ChainDeployCeloErc20 | ChainEgldEsdtTransaction | ChainDeployKccErc20): Promise<TransactionHash | { signatureId: string }> {
+    public async deployErc20(body: ChainDeployErc20 | ChainDeployCeloErc20 | ChainEgldEsdtTransaction | ChainDeployKcsErc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const {chain, ..._body} = body;
         let txData;
@@ -294,7 +295,7 @@ export abstract class Erc20Service {
                 txData = await preparePolygonDeployErc20SignedTransaction(testnet, _body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.KCS:
-                txData = await prepareKccDeployErc20SignedTransaction(_body as CoreDeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareKcsDeployErc20SignedTransaction(_body as CoreDeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
                 txData = await prepareDeployBep20SignedTransaction(_body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
