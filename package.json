@@ -1,0 +1,67 @@
+{
+  "name": "@tatumio/blockchain-connector-common",
+  "version": "2.0.0-alpha.0",
+  "description": "Tatum connector which allows to interact with Tatum API.",
+  "repository": "https://github.com/tatumio/tatum-js",
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf dist* tsconfig.tsbuildinfo",
+    "build": "tsc",
+    "prepublish": "yarn run clean && yarn run build",
+    "docs": "typedoc",
+    "lint": "yarn lerna run lint",
+    "clean:all": "yarn lerna clean --yes && find ./packages -name 'dist' -type d -prune -print -exec rm -rf '{}' \\;",
+    "bootstrap": "yarn lerna bootstrap && yarn lerna exec yarn install",
+    "publish:prerelease": "yarn lerna publish prerelease --yes --no-verify-access --dist-tag alpha --force-publish"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "keywords": [
+    "Tatum",
+    "Blockchain",
+    "Building Blocks",
+    "Bitcoin",
+    "Litecoin",
+    "Stellar",
+    "Tatum API",
+    "XRP",
+    "Ethereum"
+  ],
+  "author": "Tatum, hello@tatum.io",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.1",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^26.6.3",
+    "lerna": "^4.0.0",
+    "plop": "^3.0.5",
+    "reflect-metadata": "^0.1.13",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^26.1.1",
+    "typedoc": "^0.22.10",
+    "typescript": "4.3.2"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": ".",
+    "testRegex": ".spec.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "setupFiles": [
+      "./jest-setup-file.ts"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
